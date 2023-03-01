@@ -65,7 +65,7 @@ class Inventory(db.Model):
 
 
     def __repr__(self):
-        return f"<Inventory {self.name} id=[{self.id}]>"
+        return f"<Inventory item: id={self.id}, name={self.name}, condition={self.condition}>"
 
     def create(self):
         """
