@@ -3,11 +3,9 @@ Test cases for Inventory Model
 
 """
 import os
-import time
-import math
 import logging
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime
 from werkzeug.exceptions import NotFound
 from service.models import Inventory, Condition, DataValidationError, db
 from service import app
@@ -151,13 +149,6 @@ class TestInventoryModel(unittest.TestCase):
         logging.debug(item)
         item.id = None
         self.assertRaises(DataValidationError, item.update)
-
-    # def test_update_field_created_at(self):
-    #     """It should not allow the user to Update the created_at field"""
-    #     item = InventoryFactory()
-    #     logging.debug(item)
-    #     item.created_at = datetime(2023, 1, 1, 0, 0, 1)
-    #     self.assertRaises(DataValidationError, item.update)
     
     def test_update_field_updated_at(self):
         """It should not Update the updated_at field with the value given"""

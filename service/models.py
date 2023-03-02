@@ -128,8 +128,6 @@ class Inventory(db.Model):
                     "Invalid type for int [restock_level]: "
                     + str(type(data["restock_level"]))
                 )
-            #self.created_at = datetime.fromisoformat(data["created_at"])
-            #self.updated_at = datetime.fromisoformat(data["updated_at"])
 
         except AttributeError as error:
             raise DataValidationError(

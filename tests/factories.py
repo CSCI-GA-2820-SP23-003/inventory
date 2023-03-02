@@ -33,5 +33,3 @@ class InventoryFactory(factory.Factory):
     condition = FuzzyChoice(choices=[Condition.NEW, Condition.OPEN_BOX, Condition.USED])
     quantity = FuzzyInteger(10000)
     restock_level = FuzzyInteger(10)
-    #created_at = FuzzyDateTime(datetime(2000, 1, 1, 0, 0, 1, 0, tzinfo=timezone.utc))
-    #updated_at = created_at
