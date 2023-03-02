@@ -60,9 +60,8 @@ class Inventory(db.Model):
     condition = db.Column(db.Enum(Condition), nullable=False, server_default=(Condition.NEW.name))
     quantity = db.Column(db.Integer, nullable=False)
     restock_level = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.Date(), nullable=False, default=datetime.now())
-    updated_at = db.Column(db.Date(), nullable=False, default=updated_at_default)
-
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=updated_at_default, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f"<Inventory item: id={self.id}, name={self.name}, condition={self.condition}>"
@@ -73,6 +72,9 @@ class Inventory(db.Model):
         """
         logger.info("Creating %s", self.name)
         self.id = None  # pylint: disable=invalid-name
+        # Disregard created_at and updated_at if provided
+        self.created_at = None
+        self.updated_at = None
         db.session.add(self)
         db.session.commit()
 
@@ -81,6 +83,9 @@ class Inventory(db.Model):
         Updates an Inventory item in the database
         """
         logger.info("Saving %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
+        self.updated_at = datetime.utcnow()
         db.session.commit()
 
     def delete(self):
@@ -96,9 +101,7 @@ class Inventory(db.Model):
             "name": self.name,
             "condition": self.condition,
             "quantity": self.quantity,
-            "restock_level": self.restock_level,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "restock_level": self.restock_level
             }
 
     def deserialize(self, data):
@@ -110,11 +113,23 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
-            self.condition = getattr(Condition, data["condition"])
-            self.quantity = data["quantity"]
-            self.restock_level = data["restock_level"]
-            self.created_at = datetime.fromisoformat(data["created_at"])
-            self.updated_at = datetime.fromisoformat(data["updated_at"])
+            self.condition = getattr(Condition, data["condition"].name)
+            if isinstance(data["quantity"], int):
+                self.quantity = data["quantity"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for int [quantity]: "
+                    + str(type(data["quantity"]))
+                )
+            if isinstance(data["restock_level"], int):
+                self.restock_level = data["restock_level"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for int [restock_level]: "
+                    + str(type(data["restock_level"]))
+                )
+            #self.created_at = datetime.fromisoformat(data["created_at"])
+            #self.updated_at = datetime.fromisoformat(data["updated_at"])
 
         except AttributeError as error:
             raise DataValidationError(
@@ -127,7 +142,7 @@ class Inventory(db.Model):
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Inventory item: body of request contained bad or no data - "
-                "Error message: " + error
+                "Error message: " + str(error)
             ) from error
         return self
 
