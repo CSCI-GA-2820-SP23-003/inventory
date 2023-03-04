@@ -130,7 +130,6 @@ class TestInventoryModel(unittest.TestCase):
         # Change it an save it
         item.quantity = 25
         original_id = item.id
-        curr_time = datetime.utcnow()
         item.update()
         self.assertEqual(item.id, original_id)
         self.assertEqual(item.quantity, 25)
@@ -189,7 +188,7 @@ class TestInventoryModel(unittest.TestCase):
         self.assertIn("name", data)
         self.assertEqual(data["name"], item.name)
         self.assertIn("condition", data)
-        self.assertEqual(data["condition"], item.condition)
+        self.assertEqual(data["condition"], item.condition.name)
         self.assertIn("quantity", data)
         self.assertEqual(data["quantity"], item.quantity)
         self.assertIn("restock_level", data)
@@ -203,7 +202,7 @@ class TestInventoryModel(unittest.TestCase):
         self.assertNotEqual(item, None)
         self.assertEqual(item.id, None)
         self.assertEqual(item.name, data["name"])
-        self.assertEqual(item.condition, data["condition"])
+        self.assertEqual(item.condition.name, data["condition"])
         self.assertEqual(item.quantity, data["quantity"])
         self.assertEqual(item.restock_level, data["restock_level"])
     
