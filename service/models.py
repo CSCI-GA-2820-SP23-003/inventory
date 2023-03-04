@@ -99,7 +99,7 @@ class Inventory(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "condition": self.condition,
+            "condition": self.condition.name,
             "quantity": self.quantity,
             "restock_level": self.restock_level
             }
@@ -113,7 +113,7 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
-            self.condition = getattr(Condition, data["condition"].name)
+            self.condition = getattr(Condition, data["condition"])
             if isinstance(data["quantity"], int):
                 self.quantity = data["quantity"]
             else:
