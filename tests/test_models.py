@@ -131,7 +131,6 @@ class TestInventoryModel(unittest.TestCase):
         # Change it an save it
         item.quantity = 25
         original_id = item.id
-        curr_time = datetime.utcnow()
         item.update()
         self.assertEqual(item.id, original_id)
         self.assertEqual(item.quantity, 25)

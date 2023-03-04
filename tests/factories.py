@@ -1,11 +1,10 @@
 """
 Test Factory to make fake objects for testing
 """
-from datetime import datetime, timezone
 
 import csv
 import factory
-from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyDateTime
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from service.models import Inventory, Condition
 
 MIN_NAME_LENGTH = 1
