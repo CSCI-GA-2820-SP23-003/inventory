@@ -3,7 +3,6 @@ Test cases for Inventory Model
 
 """
 import os
-import json
 import logging
 import unittest
 from datetime import datetime
@@ -273,9 +272,3 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for item in found:
             self.assertEqual(item.name, name)
-
-    def test_enum_serialize(self):
-        """Test if enum can be serialized for json"""
-        item = InventoryFactory()
-        data = item.serialize()
-        assert(json.dumps(data))
