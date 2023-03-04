@@ -56,15 +56,18 @@ Example: `Create – POST  http://localhost:8000/inventory`
 
 Request body:
 
+```json
 {
     "name": "TEST_ABC",
     "condition":"NEW",
     "quantity": 69,
     "restock_level": 34
 }
+```
 
 Response body:
 
+```json
 {
     "condition": "NEW",
     "id": 270,
@@ -72,6 +75,7 @@ Response body:
     "quantity": 69,
     "restock_level": 34
 }
+```
 
 ### PUT /inventory/[id]
 
@@ -79,15 +83,18 @@ Example: `Update – PUT  http://localhost:8000/inventory/270`
 
 Request body:
 
+```json
 {
     "name": "TEST_ABC",
     "condition":"NEW",
     "quantity": 17,
     "restock_level": 34
 }
+```
 
 Response body:
 
+```json
 {
     "condition": "NEW",
     "id": 270,
@@ -95,6 +102,7 @@ Response body:
     "quantity": 17,
     "restock_level": 34
 }
+```
 
 ## License
 
