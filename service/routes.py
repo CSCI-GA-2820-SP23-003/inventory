@@ -28,7 +28,7 @@ def index():
 # RETRIEVE A PET
 ######################################################################
 @app.route("/inventory/<int:inventory_id>", methods=["GET"])
-def get_pets(inventory_id):
+def get_inventory(inventory_id):
     """
     Retrieve a single Inventory
 
