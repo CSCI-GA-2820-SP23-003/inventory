@@ -102,6 +102,11 @@ class TestInventoryServer(TestCase):
         response = self.client.post(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_create_item_wrong_content_type(self):
+        """It should not Create an item with wrong content type"""
+        response = self.client.post(BASE_URL, content_type = "text/html")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
     def test_create_item_bad_restock_level(self):
         """It should not Create an item with bad restock_level data"""
         test_item = InventoryFactory()
