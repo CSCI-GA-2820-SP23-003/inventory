@@ -75,16 +75,6 @@ class TestInventoryServer(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_get_inventory(self):
-        """It should Get a single Inventory"""
-        # get the id of a inventory
-        test_inventory = self._create_items(1)[0]
-        response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(data["name"], test_inventory.name)
-        
-
     def test_create_item(self):
         """It should Create a new item"""
         test_item = InventoryFactory()
@@ -98,6 +88,27 @@ class TestInventoryServer(TestCase):
         self.assertEqual(new_item["condition"], test_item.condition.name)
         self.assertEqual(new_item["quantity"], test_item.quantity)
         self.assertEqual(new_item["restock_level"], test_item.restock_level)
+
+    def test_get_item(self):
+        """It should Get a single item"""
+        # get the id of a inventory
+        test_item = self._create_items(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_item.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_item.name)
+        self.assertEqual(data["condition"], test_item.condition.name)
+        self.assertEqual(data["quantity"], test_item.quantity)
+        self.assertEqual(data["restock_level"], test_item.restock_level)
+    
+    def test_get_item_not_found(self):
+        """It should not Get an item thats not found"""
+        # get the id of a inventory
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
 
     ######################################################################
     #  T E S T   S A D   P A T H S
