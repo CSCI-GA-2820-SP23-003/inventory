@@ -90,7 +90,22 @@ def update_inventory(id):
         abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
 
     return jsonify(item.serialize()), status.HTTP_200_OK
+# DELETE AN INVENTORY ENTRY
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
+def delete_inventory(inventory_id):
+    """
+    Delete an inventory
 
+    This endpoint will delete an inventory based the id specified in the path
+    """
+    app.logger.info("Request to delete inventory with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if inventory:
+        inventory.delete()
+
+    app.logger.info("inventory with ID [%s] delete complete.", inventory_id)
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
