@@ -25,7 +25,7 @@ def index():
 
 
 ######################################################################
-# RETRIEVE A PET
+# RETRIEVE AN INVENTORY ITEM
 ######################################################################
 @app.route("/inventory/<int:inventory_id>", methods=["GET"])
 def get_inventory(inventory_id):

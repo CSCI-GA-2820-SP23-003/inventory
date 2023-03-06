@@ -13,7 +13,6 @@ from service import app
 from service.models import db, init_db, Inventory, Condition
 from tests.factories import InventoryFactory
 from service.common import status  # HTTP Status Codes
-from tests.factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -147,3 +146,4 @@ class TestInventoryServer(TestCase):
         test_item["quantity"] = "male"    # wrong case
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
