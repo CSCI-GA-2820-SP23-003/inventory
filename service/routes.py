@@ -91,44 +91,7 @@ def update_inventory(id):
 
     return jsonify(item.serialize()), status.HTTP_200_OK
 
-######################################################################
-# DELETE AN INVENTORY ENTRY
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
-def delete_inventory(inventory_id):
-    """
-    Delete an inventory
 
-    This endpoint will delete an inventory item based the id specified in the path
-    """
-    app.logger.info("Request to delete inventory with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if inventory:
-        inventory.delete()
-
-    app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
-    return "", status.HTTP_204_NO_CONTENT
-
-######################################################################
-# DELETE AN INVENTORY ENTRY
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
-def delete_inventory(inventory_id):
-    """
-    Delete an inventory
-
-    This endpoint will delete an inventory item based the id specified in the path
-    """
-    app.logger.info("Request to delete inventory with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if inventory:
-        inventory.delete()
-        app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
-
-    else:
-         app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
-   
-    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 # DELETE AN INVENTORY ENTRY
