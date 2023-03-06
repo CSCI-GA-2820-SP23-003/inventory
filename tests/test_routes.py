@@ -21,7 +21,7 @@ BASE_URL = "/inventory"
 
 
 ######################################################################
-#  T E S T   C A S E S
+#  T E S T   C A S E S   F O R   I N V E N T O R Y   S E R V I C E
 ######################################################################
 class TestInventoryServer(TestCase):
     """ REST API Server Tests """
@@ -66,7 +66,7 @@ class TestInventoryServer(TestCase):
         return items
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    # T E S T   C A S E S
     ######################################################################
 
     def test_index(self):
@@ -109,6 +109,23 @@ class TestInventoryServer(TestCase):
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
 
+    def test_update_item(self):
+        """It should Update an existing item"""
+        # Create an inventory item
+        test_item = InventoryFactory()
+        logging.debug("Test Inventory Item: %s", test_item.serialize())
+        response = self.client.post(BASE_URL, json=test_item.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Update an inventory item
+        new_item = response.get_json()
+        logging.debug("Received Test Inventory Item: %s", new_item)
+        new_item["quantity"] = 10005
+        response = self.client.put(f"{BASE_URL}/{new_item['id']}", json=new_item)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_item = response.get_json()
+        self.assertEqual(new_item["quantity"], updated_item["quantity"])
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
@@ -147,3 +164,28 @@ class TestInventoryServer(TestCase):
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_inventory_no_id(self):
+        """It should return a 404 Not Found Error if the id does not exist on updating inventory"""
+        # No new inventory item has been created
+        test_item = {'id': 34}
+        logging.debug(test_item)
+        response = self.client.put(f"{BASE_URL}/{test_item['id']}", json=test_item)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_inventory_malformed_request(self):
+        """It should return a 400 Bad Request if the data is malformed"""
+        # Inventory item has incorrect data
+        # Create an inventory item
+        test_item = InventoryFactory()
+        logging.debug("Test Inventory Item: %s", test_item.serialize())
+        response = self.client.post(BASE_URL, json=test_item.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Update an inventory item
+        test_item = response.get_json()
+        logging.debug("Received Test Inventory Item: %s", test_item)
+        test_item["quantity"] = 10005
+        # Removing the restock level which will create malformed request
+        del test_item["restock_level"]
+        response = self.client.put(f"{BASE_URL}/{test_item['id']}", json=test_item)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

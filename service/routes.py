@@ -1,12 +1,12 @@
 """
-My Service
+Inventory Service
 
-Describe what your service does here
+Service is used to manage products in the inventory.
 """
 
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory
+from service.models import Inventory, DataValidationError
 
 # Import Flask application
 from . import app
@@ -47,8 +47,6 @@ def get_inventory(inventory_id):
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# Place your REST API code here ...
-
 ######################################################################
 # ADD A NEW INVENTORY ENTRY
 ######################################################################
@@ -68,6 +66,30 @@ def create_inventory_item():#Replace entry with item
     app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
     return jsonify(message), status.HTTP_201_CREATED
 
+######################################################################
+#  UPDATE AN INVENTORY ITEM
+######################################################################
+
+@app.route("/inventory/<int:id>", methods=["PUT"])
+def update_inventory(id):
+    """
+    Updating an inventory item
+    This endpoint will update an item based on the data in the body that is posted
+    """
+
+    app.logger.info("Requesr to update an inventory item with id:%s", id)
+    check_content_type("application/json")
+    item = Inventory.find(id)
+    if not item:
+        abort(status.HTTP_404_NOT_FOUND, "Item with id:%s not found", id)
+    try:
+        item.deserialize(request.get_json())
+        item.id = id
+        item.update()
+    except DataValidationError as err:
+        abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
