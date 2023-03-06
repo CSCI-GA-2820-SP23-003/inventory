@@ -108,6 +108,7 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
+        
     def test_delete_inventory(self):
         """It should Delete a inventory"""
         test_inventory = self._create_items(1)[0]
