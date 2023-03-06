@@ -6,7 +6,7 @@ Service is used to manage products in the inventory.
 
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory
+from service.models import Inventory, DataValidationError
 
 # Import Flask application
 from . import app
@@ -25,9 +25,46 @@ def index():
 
 
 ######################################################################
+# RETRIEVE AN INVENTORY ITEM
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
+def get_inventory(inventory_id):
+    """
+    Retrieve a single Inventory
+
+    This endpoint will return a Inventory based on it's id
+    """
+    app.logger.info("Request for item with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+
+    app.logger.info("Returning item: %s", inventory.name)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
+
+######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+######################################################################
+# ADD A NEW INVENTORY ENTRY
+######################################################################
+@app.route("/inventory", methods=["POST"])
+def create_inventory_item():#Replace entry with item
+    """
+    Creates an inventory item
+    This endpoint will create an item based on the data in the body that is posted
+    """
+    app.logger.info("Request to create an inventory item")
+    check_content_type("application/json")
+    item = Inventory()
+    item.deserialize(request.get_json())
+    item.create()
+    message = item.serialize()
+
+    app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
+    return jsonify(message), status.HTTP_201_CREATED
 
 ######################################################################
 #  UPDATE AN INVENTORY ITEM
@@ -52,4 +89,28 @@ def update_inventory(id):
     except DataValidationError as err:
         abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
 
-    return item.serialize(), status.HTTP_200_OK
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {content_type}",
+    )
