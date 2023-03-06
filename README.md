@@ -107,7 +107,7 @@ Response body:
 ### READ /inventory/[id]
 
 Case 1 :
-Example: `Update – GET  http://localhost:8000/inventory/270`
+Example: `Get – GET  http://localhost:8000/inventory/270`
 
 Response body: (Item with id 270 exists)
 
@@ -122,7 +122,7 @@ Response body: (Item with id 270 exists)
 ```
 
 Case 2:
-Example: `Update – GET  http://localhost:8000/inventory/270`
+Example: `Get – GET  http://localhost:8000/inventory/270`
 
 Response body: (Item with id 270 does not exists)
 
@@ -136,7 +136,7 @@ Response body: (Item with id 270 does not exists)
 
 ### DELETE /inventory/[id]
 
-Example: `Update – DELETE http://localhost:8000/inventory/270`
+Example: `Delete – DELETE http://localhost:8000/inventory/270`
 
 Response status: 204 NO CONTENT
 
