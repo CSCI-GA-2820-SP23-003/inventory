@@ -104,6 +104,42 @@ Response body:
 }
 ```
 
+### READ /inventory/[id]
+
+Case 1 :
+Example: `Update – GET  http://localhost:8000/inventory/270`
+
+Response body: (Item with id 270 exists)
+
+```json
+{
+    "condition": "NEW",
+    "id": 270,
+    "name": "TEST_ABC",
+    "quantity": 17,
+    "restock_level": 34
+}
+```
+
+Case 2:
+Example: `Update – GET  http://localhost:8000/inventory/270`
+
+Response body: (Item with id 270 does not exists)
+
+```json
+{
+  "error": "Not Found",
+  "message": "404 Not Found: Inventory with id '270' was not found.",
+  "status": 404
+}
+```
+
+### DELETE /inventory/[id]
+
+Example: `Update – DELETE http://localhost:8000/inventory/270`
+
+Response status: 204 NO CONTENT
+
 ## License
 
 Copyright (c) John Rofrano. All rights reserved.
