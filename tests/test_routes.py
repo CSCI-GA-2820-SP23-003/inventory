@@ -10,7 +10,7 @@ import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
-from service.models import db, init_db, Inventory, init_db, Inventory, Condition
+from service.models import db, init_db, Inventory, Condition
 from tests.factories import InventoryFactory
 from service.common import status  # HTTP Status Codes
 from tests.factories import InventoryFactory
@@ -44,7 +44,6 @@ class TestInventoryServer(TestCase):
 
     def setUp(self):
         """ This runs before each test """
-
         self.client = app.test_client()
         db.session.query(Inventory).delete()  # clean up the last tests
         db.session.commit()
