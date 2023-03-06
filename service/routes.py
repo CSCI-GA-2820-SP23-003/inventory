@@ -68,7 +68,23 @@ def create_inventory_item():#Replace entry with item
     app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
     return jsonify(message), status.HTTP_201_CREATED
 
+######################################################################
+# DELETE AN INVENTORY ENTRY
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
+def delete_inventory(inventory_id):
+    """
+    Delete an inventory
 
+    This endpoint will delete an inventory based the id specified in the path
+    """
+    app.logger.info("Request to delete inventory with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if inventory:
+        inventory.delete()
+
+    app.logger.info("inventory with ID [%s] delete complete.", inventory_id)
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
