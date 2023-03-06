@@ -45,7 +45,6 @@ class TestInventoryServer(TestCase):
     def setUp(self):
         """ This runs before each test """
 
-        self.app = app.test_client()
         self.client = app.test_client()
         db.session.query(Inventory).delete()  # clean up the last tests
         db.session.commit()
@@ -80,7 +79,7 @@ class TestInventoryServer(TestCase):
     def test_get_inventory(self):
         """It should Get a single Inventory"""
         # get the id of a inventory
-        test_inventory = self._create_inventories(1)[0]
+        test_inventory = self._create_items(1)[0]
         response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
