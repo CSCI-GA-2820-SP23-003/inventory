@@ -19,6 +19,7 @@ DATABASE_URI = os.getenv(
 )
 BASE_URL = "/inventory"
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -42,7 +43,6 @@ class TestInventoryServer(TestCase):
 
     def setUp(self):
         """ This runs before each test """
-        self.app = app.test_client()
         self.client = app.test_client()
         db.session.query(Inventory).delete()  # clean up the last tests
         db.session.commit()
@@ -71,7 +71,7 @@ class TestInventoryServer(TestCase):
 
     def test_index(self):
         """ It should call the home page """
-        resp = self.app.get("/")
+        resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_create_item(self):
@@ -87,6 +87,27 @@ class TestInventoryServer(TestCase):
         self.assertEqual(new_item["condition"], test_item.condition.name)
         self.assertEqual(new_item["quantity"], test_item.quantity)
         self.assertEqual(new_item["restock_level"], test_item.restock_level)
+
+    def test_get_item(self):
+        """It should Get a single item"""
+        # get the id of a inventory
+        test_item = self._create_items(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_item.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_item.name)
+        self.assertEqual(data["condition"], test_item.condition.name)
+        self.assertEqual(data["quantity"], test_item.quantity)
+        self.assertEqual(data["restock_level"], test_item.restock_level)
+    
+    def test_get_item_not_found(self):
+        """It should not Get an item thats not found"""
+        # get the id of a inventory
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
 
     ######################################################################
     #  T E S T   S A D   P A T H S
@@ -125,3 +146,4 @@ class TestInventoryServer(TestCase):
         test_item["quantity"] = "male"    # wrong case
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+

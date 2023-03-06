@@ -25,6 +25,25 @@ def index():
 
 
 ######################################################################
+# RETRIEVE AN INVENTORY ITEM
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
+def get_inventory(inventory_id):
+    """
+    Retrieve a single Inventory
+
+    This endpoint will return a Inventory based on it's id
+    """
+    app.logger.info("Request for item with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+
+    app.logger.info("Returning item: %s", inventory.name)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
+
+######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
