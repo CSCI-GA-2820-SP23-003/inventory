@@ -78,10 +78,11 @@ class TestInventoryServer(TestCase):
         self.assertIn("version", data)
         self.assertIn("endpoints", data)
         self.assertIn("usage", data)
-        self.assertIn("POST  ", data["endpoints"])
-        self.assertIn("PUT   ", data["endpoints"])
-        self.assertIn("GET   ", data["endpoints"])
-        self.assertIn("DELETE", data["endpoints"])
+        self.assertIn("POST   /inventory     ", data["endpoints"])
+        self.assertIn("PUT    /inventory<id> ", data["endpoints"])
+        self.assertIn("GET    /inventory<id> ", data["endpoints"])
+        self.assertIn("DELETE /inventory/<id>", data["endpoints"])
+        self.assertIn("GET    /inventory     ", data["endpoints"])
 
     def test_create_item(self):
         """It should Create a new item"""
@@ -160,6 +161,14 @@ class TestInventoryServer(TestCase):
         updated_item = response.get_json()
         self.assertEqual(new_item["quantity"], updated_item["quantity"])
 
+    def test_list_all_inventory_items(self):
+        """It should Get a list of all inventory item"""
+        self._create_items(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
 
     ######################################################################
     #  T E S T   S A D   P A T H S
@@ -234,14 +243,6 @@ class TestInventoryServer(TestCase):
         del test_item["restock_level"]
         response = self.client.put(f"{BASE_URL}/{test_item['id']}", json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_list_all_inventory_items(self):
-        """It should Get a list of all inventory item"""
-        self._create_items(5)
-        response = self.client.get(BASE_URL)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), 5)
 
     def test_method_not_allowed(self):
         """It should not allow the user to send a request with an unsupported method"""
