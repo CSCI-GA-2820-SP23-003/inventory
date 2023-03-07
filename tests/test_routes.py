@@ -70,9 +70,18 @@ class TestInventoryServer(TestCase):
     ######################################################################
 
     def test_index(self):
-        """ It should call the home page """
-        resp = self.client.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        """ It should call the home page with brief info"""
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], "Inventory REST API Service")
+        self.assertIn("version", data)
+        self.assertIn("endpoints", data)
+        self.assertIn("usage", data)
+        self.assertIn("POST  ", data["endpoints"])
+        self.assertIn("PUT   ", data["endpoints"])
+        self.assertIn("GET   ", data["endpoints"])
+        self.assertIn("DELETE", data["endpoints"])
 
     def test_create_item(self):
         """It should Create a new item"""
@@ -80,6 +89,10 @@ class TestInventoryServer(TestCase):
         logging.debug("Test Item: %s", test_item.serialize())
         response = self.client.post(BASE_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
 
         # Check the data is correct
         new_item = response.get_json()

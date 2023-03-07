@@ -18,29 +18,23 @@ from . import app
 @app.route("/")
 def index():
     """ Root URL response """
+    app.logger.info("Request for Root URL")
+    path = url_for('create_inventory_item', _external=True)
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Inventory REST API Service",
+            version="1.0",
+            paths=path,
+            endpoints={
+                "DELETE" : "Delete an inventory by <id>",
+                "POST  " : "Create an inventory",
+                "PUT   " : "Update an inventory by <id>",
+                "GET   " : "Read an inventory by <id>",
+            },
+            usage=f"<endpoints> {path}[/id]"
+        ),
         status.HTTP_200_OK,
     )
-
-
-######################################################################
-# RETRIEVE AN INVENTORY ITEM
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["GET"])
-def get_inventory(inventory_id):
-    """
-    Retrieve a single Inventory
-
-    This endpoint will return a Inventory based on it's id
-    """
-    app.logger.info("Request for item with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
-
-    app.logger.info("Returning item: %s", inventory.name)
-    return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -62,9 +56,30 @@ def create_inventory_item():#Replace entry with item
     item.deserialize(request.get_json())
     item.create()
     message = item.serialize()
+    location_url = url_for("get_inventory", inventory_id=item.id, _external=True)
 
     app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
-    return jsonify(message), status.HTTP_201_CREATED
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+
+######################################################################
+# RETRIEVE AN INVENTORY ITEM
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
+def get_inventory(inventory_id):
+    """
+    Retrieve a single Inventory
+
+    This endpoint will return a Inventory based on it's id
+    """
+    app.logger.info("Request for item with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+
+    app.logger.info("Returning item: %s", inventory.name)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
 
 ######################################################################
 #  UPDATE AN INVENTORY ITEM
