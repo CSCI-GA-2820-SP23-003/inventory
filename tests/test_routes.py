@@ -108,6 +108,28 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
+        
+    def test_delete_item(self):
+        """It should Delete a inventory that is present in the database"""
+        test_inventory = self._create_items(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_item_not_found(self):
+        """ It should return a 204 on deleting an item that is not present in the database""" 
+        # make sure item is not present in the database
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        # Delete an item that is missing from the database
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        logging.debug("Item with id %s does not exist. Delete returned 204 NO CONTENT")
+        
 
     def test_update_item(self):
         """It should Update an existing item"""
