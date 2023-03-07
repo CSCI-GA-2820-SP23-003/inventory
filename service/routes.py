@@ -28,7 +28,7 @@ def index():
                 "POST  " : f"Create an inventory         - {url_for('create_inventory_item', _external=True)}",
                 "PUT   " : f"Update an inventory by <id> - {url_for('update_inventory', id=1, _external=True)}",
                 "GET   " : f"Read an inventory by <id>   - {url_for('get_inventory', inventory_id=1, _external=True)}",
-                # "DELETE" : f"Delete an inventory by <id> - {url_for('delete_inventory', inventory_id=1, _external=True)}",
+                "DELETE" : f"Delete an inventory by <id> - {url_for('delete_inventory', inventory_id=1, _external=True)}",
             }
         ),
         status.HTTP_200_OK,
@@ -54,9 +54,10 @@ def create_inventory_item():#Replace entry with item
     item.deserialize(request.get_json())
     item.create()
     message = item.serialize()
+    location_url = url_for("get_inventory", inventory_id=item.id, _external=True)
 
     app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
-    return jsonify(message), status.HTTP_201_CREATED
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
