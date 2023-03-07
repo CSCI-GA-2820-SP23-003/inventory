@@ -42,7 +42,7 @@ def index():
 ######################################################################
 
 ######################################################################
-# ADD A NEW INVENTORY ENTRY
+# ADD A NEW INVENTORY ITEM
 ######################################################################
 @app.route("/inventory", methods=["POST"])
 def create_inventory_item():#Replace entry with item
@@ -92,7 +92,7 @@ def update_inventory(id):
     This endpoint will update an item based on the data in the body that is posted
     """
 
-    app.logger.info("Requesr to update an inventory item with id:%s", id)
+    app.logger.info("Request to update an inventory item with id:%s", id)
     check_content_type("application/json")
     item = Inventory.find(id)
     if not item:
@@ -109,7 +109,7 @@ def update_inventory(id):
 
 
 ######################################################################
-# DELETE AN INVENTORY ENTRY
+# DELETE AN INVENTORY ITEM
 ######################################################################
 @app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
 def delete_inventory(inventory_id):
@@ -125,8 +125,8 @@ def delete_inventory(inventory_id):
         app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
 
     else:
-         app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
-   
+        app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
+
     return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################

@@ -11,8 +11,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, init_db, Inventory, Condition
-from tests.factories import InventoryFactory
 from service.common import status  # HTTP Status Codes
+from tests.factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -112,7 +112,7 @@ class TestInventoryServer(TestCase):
         self.assertEqual(data["condition"], test_item.condition.name)
         self.assertEqual(data["quantity"], test_item.quantity)
         self.assertEqual(data["restock_level"], test_item.restock_level)
-    
+
     def test_get_item_not_found(self):
         """It should not Get an item thats not found"""
         # get the id of a inventory
@@ -121,7 +121,7 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
-        
+
     def test_delete_item(self):
         """It should Delete a inventory that is present in the database"""
         test_inventory = self._create_items(1)[0]
@@ -142,7 +142,6 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
         logging.debug("Item with id %s does not exist. Delete returned 204 NO CONTENT")
-        
 
     def test_update_item(self):
         """It should Update an existing item"""
