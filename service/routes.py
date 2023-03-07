@@ -18,29 +18,21 @@ from . import app
 @app.route("/")
 def index():
     """ Root URL response """
+    app.logger.info("Request for Root URL")
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Inventory REST API Service",
+            version="1.0",
+            # paths=url_for("list_inventory", _external=True), #TODO: add list inventory url
+            endpoints={
+                "POST  " : f"Create an inventory         - {url_for('create_inventory_item', _external=True)}",
+                "PUT   " : f"Update an inventory by <id> - {url_for('update_inventory', id=1, _external=True)}",
+                "GET   " : f"Read an inventory by <id>   - {url_for('get_inventory', inventory_id=1, _external=True)}",
+                # "DELETE" : f"Delete an inventory by <id> - {url_for('delete_inventory', inventory_id=1, _external=True)}",
+            }
+        ),
         status.HTTP_200_OK,
     )
-
-
-######################################################################
-# RETRIEVE AN INVENTORY ITEM
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["GET"])
-def get_inventory(inventory_id):
-    """
-    Retrieve a single Inventory
-
-    This endpoint will return a Inventory based on it's id
-    """
-    app.logger.info("Request for item with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
-
-    app.logger.info("Returning item: %s", inventory.name)
-    return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -65,6 +57,26 @@ def create_inventory_item():#Replace entry with item
 
     app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
     return jsonify(message), status.HTTP_201_CREATED
+
+
+######################################################################
+# RETRIEVE AN INVENTORY ITEM
+######################################################################
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
+def get_inventory(inventory_id):
+    """
+    Retrieve a single Inventory
+
+    This endpoint will return a Inventory based on it's id
+    """
+    app.logger.info("Request for item with id: %s", inventory_id)
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+
+    app.logger.info("Returning item: %s", inventory.name)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
 
 ######################################################################
 #  UPDATE AN INVENTORY ITEM
