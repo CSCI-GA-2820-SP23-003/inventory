@@ -161,6 +161,7 @@ class TestInventoryServer(TestCase):
         updated_item = response.get_json()
         self.assertEqual(new_item["quantity"], updated_item["quantity"])
 
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
@@ -224,3 +225,11 @@ class TestInventoryServer(TestCase):
         del test_item["restock_level"]
         response = self.client.put(f"{BASE_URL}/{test_item['id']}", json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_list_all_inventory_items(self):
+        """It should Get a list of all inventory item"""
+        self._create_items(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)

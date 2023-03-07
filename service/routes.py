@@ -130,6 +130,22 @@ def delete_inventory(inventory_id):
     return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
+# LIST ALL INVENTORY ITEMS
+######################################################################
+@app.route("/inventory", methods=["GET"])
+def list_inventory_items():
+    """
+    List all inventory items
+    This endpoint will list all inventory items in the database
+    """
+    app.logger.info("Request to list all inventory items")
+    items = Inventory.all()
+    results = [item.serialize() for item in items]
+    app.logger.info("Returning %d inventory items", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
