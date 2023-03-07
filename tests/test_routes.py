@@ -70,13 +70,14 @@ class TestInventoryServer(TestCase):
     ######################################################################
 
     def test_index(self):
-        """ It should call the home page """
+        """ It should call the home page with brief info"""
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], "Inventory REST API Service")
         self.assertIn("version", data)
         self.assertIn("endpoints", data)
+        self.assertIn("usage", data)
         self.assertIn("POST  ", data["endpoints"])
         self.assertIn("PUT   ", data["endpoints"])
         self.assertIn("GET   ", data["endpoints"])

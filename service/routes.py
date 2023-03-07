@@ -19,17 +19,23 @@ from . import app
 def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
+    path = url_for('create_inventory_item', _external=True)
     return (
         jsonify(
             name="Inventory REST API Service",
             version="1.0",
-            # paths=url_for("list_inventory", _external=True), #TODO: add list inventory url
+            paths=path,
             endpoints={
-                "POST  " : f"Create an inventory         - {url_for('create_inventory_item', _external=True)}",
-                "PUT   " : f"Update an inventory by <id> - {url_for('update_inventory', id=1, _external=True)}",
-                "GET   " : f"Read an inventory by <id>   - {url_for('get_inventory', inventory_id=1, _external=True)}",
-                "DELETE" : f"Delete an inventory by <id> - {url_for('delete_inventory', inventory_id=1, _external=True)}",
-            }
+                # f"DELETE {path}/<id>" : "Delete an inventory by <id>",
+                # f"POST   {path}     " : "Create an inventory",
+                # f"PUT    {path}/<id>" : "Update an inventory by <id>",
+                # f"GET    {path}/<id>" : "Read an inventory by <id>",
+                f"DELETE" : "Delete an inventory by <id>",
+                f"POST  " : "Create an inventory",
+                f"PUT   " : "Update an inventory by <id>",
+                f"GET   " : "Read an inventory by <id>",
+            },
+            usage=f"<endpoints> {path}[/id]"
         ),
         status.HTTP_200_OK,
     )
