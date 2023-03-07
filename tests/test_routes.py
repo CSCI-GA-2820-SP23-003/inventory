@@ -200,6 +200,16 @@ class TestInventoryServer(TestCase):
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_inventory_bad_condition(self):
+        """It should not Create an item with bad a bad condition"""
+        item = InventoryFactory()
+        logging.debug(item)
+        # change condition to a bad string
+        test_item = item.serialize()
+        test_item["condition"] = "damaged"
+        response = self.client.post(BASE_URL, json=test_item)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_inventory_no_id(self):
         """It should return a 404 Not Found Error if the id does not exist on updating inventory"""
         # No new inventory item has been created
@@ -233,3 +243,8 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_method_not_allowed(self):
+        """It should not allow the user to send a request with an unsupported method"""
+        response = self.client.post(f"{BASE_URL}/1")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
