@@ -26,14 +26,10 @@ def index():
             version="1.0",
             paths=path,
             endpoints={
-                # f"DELETE {path}/<id>" : "Delete an inventory by <id>",
-                # f"POST   {path}     " : "Create an inventory",
-                # f"PUT    {path}/<id>" : "Update an inventory by <id>",
-                # f"GET    {path}/<id>" : "Read an inventory by <id>",
-                f"DELETE" : "Delete an inventory by <id>",
-                f"POST  " : "Create an inventory",
-                f"PUT   " : "Update an inventory by <id>",
-                f"GET   " : "Read an inventory by <id>",
+                "DELETE" : "Delete an inventory by <id>",
+                "POST  " : "Create an inventory",
+                "PUT   " : "Update an inventory by <id>",
+                "GET   " : "Read an inventory by <id>",
             },
             usage=f"<endpoints> {path}[/id]"
         ),
