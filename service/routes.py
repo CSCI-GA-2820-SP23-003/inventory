@@ -26,10 +26,11 @@ def index():
             version="1.0",
             paths=path,
             endpoints={
-                "DELETE" : "Delete an inventory by <id>",
-                "POST  " : "Create an inventory",
-                "PUT   " : "Update an inventory by <id>",
-                "GET   " : "Read an inventory by <id>",
+                "DELETE /inventory/<id>" : "Delete an inventory by <id>",
+                "POST   /inventory     " : "Create an inventory",
+                "PUT    /inventory<id> " : "Update an inventory by <id>",
+                "GET    /inventory<id> " : "Read an inventory by <id>",
+                "GET    /inventory     " : "List entire inventory",
             },
             usage=f"<endpoints> {path}[/id]"
         ),
@@ -42,7 +43,7 @@ def index():
 ######################################################################
 
 ######################################################################
-# ADD A NEW INVENTORY ENTRY
+# ADD A NEW INVENTORY ITEM
 ######################################################################
 @app.route("/inventory", methods=["POST"])
 def create_inventory_item():#Replace entry with item
@@ -92,7 +93,7 @@ def update_inventory(id):
     This endpoint will update an item based on the data in the body that is posted
     """
 
-    app.logger.info("Requesr to update an inventory item with id:%s", id)
+    app.logger.info("Request to update an inventory item with id:%s", id)
     check_content_type("application/json")
     item = Inventory.find(id)
     if not item:
@@ -109,7 +110,7 @@ def update_inventory(id):
 
 
 ######################################################################
-# DELETE AN INVENTORY ENTRY
+# DELETE AN INVENTORY ITEM
 ######################################################################
 @app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
 def delete_inventory(inventory_id):
@@ -125,9 +126,25 @@ def delete_inventory(inventory_id):
         app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
 
     else:
-         app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
-   
+        app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
+
     return "", status.HTTP_204_NO_CONTENT
+
+######################################################################
+# LIST ALL INVENTORY ITEMS
+######################################################################
+@app.route("/inventory", methods=["GET"])
+def list_inventory_items():
+    """
+    List all inventory items
+    This endpoint will list all inventory items in the database
+    """
+    app.logger.info("Request to list all inventory items")
+    items = Inventory.all()
+    results = [item.serialize() for item in items]
+    app.logger.info("Returning %d inventory items", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

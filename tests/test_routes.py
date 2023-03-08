@@ -11,8 +11,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, init_db, Inventory, Condition
-from tests.factories import InventoryFactory
 from service.common import status  # HTTP Status Codes
+from tests.factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -78,10 +78,11 @@ class TestInventoryServer(TestCase):
         self.assertIn("version", data)
         self.assertIn("endpoints", data)
         self.assertIn("usage", data)
-        self.assertIn("POST  ", data["endpoints"])
-        self.assertIn("PUT   ", data["endpoints"])
-        self.assertIn("GET   ", data["endpoints"])
-        self.assertIn("DELETE", data["endpoints"])
+        self.assertIn("POST   /inventory     ", data["endpoints"])
+        self.assertIn("PUT    /inventory<id> ", data["endpoints"])
+        self.assertIn("GET    /inventory<id> ", data["endpoints"])
+        self.assertIn("DELETE /inventory/<id>", data["endpoints"])
+        self.assertIn("GET    /inventory     ", data["endpoints"])
 
     def test_create_item(self):
         """It should Create a new item"""
@@ -112,7 +113,7 @@ class TestInventoryServer(TestCase):
         self.assertEqual(data["condition"], test_item.condition.name)
         self.assertEqual(data["quantity"], test_item.quantity)
         self.assertEqual(data["restock_level"], test_item.restock_level)
-    
+
     def test_get_item_not_found(self):
         """It should not Get an item thats not found"""
         # get the id of a inventory
@@ -121,7 +122,7 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
-        
+
     def test_delete_item(self):
         """It should Delete a inventory that is present in the database"""
         test_inventory = self._create_items(1)[0]
@@ -142,7 +143,6 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
         logging.debug("Item with id %s does not exist. Delete returned 204 NO CONTENT")
-        
 
     def test_update_item(self):
         """It should Update an existing item"""
@@ -160,6 +160,15 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_item = response.get_json()
         self.assertEqual(new_item["quantity"], updated_item["quantity"])
+
+    def test_list_all_inventory_items(self):
+        """It should Get a list of all inventory item"""
+        self._create_items(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
 
     ######################################################################
     #  T E S T   S A D   P A T H S
@@ -199,6 +208,16 @@ class TestInventoryServer(TestCase):
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_inventory_bad_condition(self):
+        """It should not Create an item with bad a bad condition"""
+        item = InventoryFactory()
+        logging.debug(item)
+        # change condition to a bad string
+        test_item = item.serialize()
+        test_item["condition"] = "damaged"
+        response = self.client.post(BASE_URL, json=test_item)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_inventory_no_id(self):
         """It should return a 404 Not Found Error if the id does not exist on updating inventory"""
         # No new inventory item has been created
@@ -224,3 +243,8 @@ class TestInventoryServer(TestCase):
         del test_item["restock_level"]
         response = self.client.put(f"{BASE_URL}/{test_item['id']}", json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_method_not_allowed(self):
+        """It should not allow the user to send a request with an unsupported method"""
+        response = self.client.post(f"{BASE_URL}/1")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -104,10 +104,10 @@ Response body:
 }
 ```
 
-### READ /inventory/[id]
+### GET /inventory/[id]
 
 Case 1 :
-Example: `Get – GET  http://localhost:8000/inventory/270`
+Example: `Read – GET  http://localhost:8000/inventory/270`
 
 Response body: (Item with id 270 exists)
 
@@ -139,6 +139,31 @@ Response body: (Item with id 270 does not exists)
 Example: `Delete – DELETE http://localhost:8000/inventory/270`
 
 Response status: 204 NO CONTENT
+
+### GET /inventory
+
+Example: `List - GET http://localhost:8000/inventory/`
+
+Response body:
+
+```json
+[
+  {
+    "condition": "NEW",
+    "id": 270,
+    "name": "TEST_ABC",
+    "quantity": 17,
+    "restock_level": 34
+  },
+  {
+    "condition": "USED",
+    "id": 2238,
+    "name": "TEST_XYZ",
+    "quantity": 105,
+    "restock_level": 7
+  }
+]
+```
 
 ## License
 

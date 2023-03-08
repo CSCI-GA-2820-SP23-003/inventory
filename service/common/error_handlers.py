@@ -71,19 +71,20 @@ def method_not_supported(error):
     )
 
 
-@app.errorhandler(status.HTTP_409_CONFLICT)
-def resource_conflict(error):
-    """Handles resource conflicts with HTTP_409_CONFLICT"""
-    message = str(error)
-    app.logger.warning(message)
-    return (
-        jsonify(
-            status=status.HTTP_409_CONFLICT,
-            error="Conflict",
-            message=message,
-        ),
-        status.HTTP_409_CONFLICT,
-    )
+# Inventory does not have a usecase for a 409 conflict
+# @app.errorhandler(status.HTTP_409_CONFLICT)
+# def resource_conflict(error):
+#     """Handles resource conflicts with HTTP_409_CONFLICT"""
+#     message = str(error)
+#     app.logger.warning(message)
+#     return (
+#         jsonify(
+#             status=status.HTTP_409_CONFLICT,
+#             error="Conflict",
+#             message=message,
+#         ),
+#         status.HTTP_409_CONFLICT,
+#     )
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)

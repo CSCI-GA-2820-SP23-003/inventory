@@ -51,10 +51,12 @@ class TestInventoryModel(unittest.TestCase):
     def test_create_an_inventory_item(self):
         """It should Create an Inventory item and assert that it exists"""
         item = Inventory(
-            name="Nike shoes", condition=Condition.NEW, 
+            name="Nike shoes", condition=Condition.NEW,
             quantity=5, restock_level=1
         )
-        self.assertEqual(str(item), "<Inventory item: id=None, name=Nike shoes, condition=Condition.NEW>")
+        self.assertEqual(
+            str(item), "<Inventory item: id=None, name=Nike shoes," \
+                " condition=Condition.NEW>")
         self.assertTrue(item is not None)
         self.assertEqual(item.id, None)
         self.assertEqual(item.name, "Nike shoes")
@@ -68,7 +70,7 @@ class TestInventoryModel(unittest.TestCase):
         items = Inventory.all()
         self.assertEqual(items, [])
         item = Inventory(
-            name="Nike shoes", condition=Condition.NEW, quantity=5, 
+            name="Nike shoes", condition=Condition.NEW, quantity=5,
             restock_level=1, created_at=curr_time, updated_at=curr_time
         )
         self.assertTrue(item is not None)
@@ -148,7 +150,7 @@ class TestInventoryModel(unittest.TestCase):
         logging.debug(item)
         item.id = None
         self.assertRaises(DataValidationError, item.update)
-    
+
     def test_update_field_updated_at(self):
         """It should not Update the updated_at field with the value given"""
         item = InventoryFactory()
@@ -205,7 +207,7 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(item.condition.name, data["condition"])
         self.assertEqual(item.quantity, data["quantity"])
         self.assertEqual(item.restock_level, data["restock_level"])
-    
+
     def test_deserialize_missing_data(self):
         """It should not deserialize an Inventory item with missing data"""
         data = {
@@ -230,7 +232,7 @@ class TestInventoryModel(unittest.TestCase):
         item = Inventory()
         self.assertRaises(DataValidationError, item.deserialize, data)
         data["quantity"] = 100
-        assert(item.deserialize(data))
+        assert item.deserialize(data)
         data["restock_level"] = "5"
         self.assertRaises(DataValidationError, item.deserialize, data)
 
