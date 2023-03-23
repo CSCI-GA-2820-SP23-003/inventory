@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Inventory
 
 All of the models are stored in this module
 
