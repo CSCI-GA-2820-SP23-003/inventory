@@ -19,10 +19,11 @@ with open('tests/fixtures/inventory_item_names.csv', newline='') as csvfile:
         if MIN_NAME_LENGTH <= len(item_name) <= MAX_NAME_LENGTH:
             INVENTORY_ITEM_NAMES.append(item_name)
 
+
 class InventoryFactory(factory.Factory):
     """Creates fake pets that you don't have to feed"""
 
-    class Meta: # pylint: disable=too-few-public-methods
+    class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
 
         model = Inventory
