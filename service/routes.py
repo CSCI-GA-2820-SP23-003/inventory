@@ -50,6 +50,7 @@ def index():
 def create_inventory_item():  # Replace entry with item
     """
     Creates an inventory item
+
     This endpoint will create an item based on the data in the body that is posted
     """
     app.logger.info("Request to create an inventory item")
@@ -91,6 +92,7 @@ def get_inventory(inventory_id):
 def update_inventory(inventory_id):
     """
     Updating an inventory item
+
     This endpoint will update an item based on the data in the body that is posted
     """
 
@@ -138,6 +140,7 @@ def delete_inventory(inventory_id):
 def list_inventory_items():
     """
     List all inventory items
+
     This endpoint will list all inventory items in the database
     """
     app.logger.info("Request to list all inventory items")
@@ -145,6 +148,36 @@ def list_inventory_items():
     results = [item.serialize() for item in items]
     app.logger.info("Returning %d inventory items", len(results))
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# RESTOCK AN INVENTORY ITEM
+######################################################################
+
+@app.route("/inventory/<int:inventory_id>/restock", methods=["PUT"])
+def restock_inventory(inventory_id):
+    """
+    Restock an existing inventory item
+
+    This is an Action as URL that will perform an restock to an existing
+    inventory item in the database
+    """
+    app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)
+    item = Inventory.find(inventory_id)
+    if not item:
+        abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s was not found", inventory_id)
+    if item.quantity > item.restock_level:
+        abort(
+            status.HTTP_409_CONFLICT,
+            "Item with inventory_id:%s is already above the restock level",
+            inventory_id
+        )
+    else:
+        item.quantity = item.restock_level + 1
+        item.id = inventory_id
+        item.update()
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
 
 
 ######################################################################

@@ -71,20 +71,21 @@ def method_not_supported(error):
     )
 
 
-# Inventory does not have a usecase for a 409 conflict
-# @app.errorhandler(status.HTTP_409_CONFLICT)
-# def resource_conflict(error):
-#     """Handles resource conflicts with HTTP_409_CONFLICT"""
-#     message = str(error)
-#     app.logger.warning(message)
-#     return (
-#         jsonify(
-#             status=status.HTTP_409_CONFLICT,
-#             error="Conflict",
-#             message=message,
-#         ),
-#         status.HTTP_409_CONFLICT,
-#     )
+# Used for restock action:
+#   returned if the stock was already above the restock level
+@app.errorhandler(status.HTTP_409_CONFLICT)
+def resource_conflict(error):
+    """Handles resource conflicts with HTTP_409_CONFLICT"""
+    message = str(error)
+    app.logger.warning(message)
+    return (
+        jsonify(
+            status=status.HTTP_409_CONFLICT,
+            error="Conflict",
+            message=message,
+        ),
+        status.HTTP_409_CONFLICT,
+    )
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
