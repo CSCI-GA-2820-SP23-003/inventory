@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Inventory
 
 All of the models are stored in this module
 
@@ -18,7 +18,6 @@ restock_level (number) - the restock level of the Inventory item
 import logging
 from enum import Enum
 from datetime import datetime
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -44,12 +43,15 @@ class Condition(Enum):
     OPEN_BOX = 1
     USED = 2
 
+
 def updated_at_default(context):
+    """ Initializes the created_at time """
     return context.get_current_parameters()["created_at"]
+
 
 class Inventory(db.Model):
     """
-    Class that represents a YourResourceModel
+    Class that represents a Inventory
     """
 
     app = None
@@ -61,7 +63,8 @@ class Inventory(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     restock_level = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=updated_at_default, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, nullable=False, default=updated_at_default, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f"<Inventory item: id={self.id}, name={self.name}, condition={self.condition}>"

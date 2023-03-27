@@ -8,9 +8,8 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
 from service import app
-from service.models import db, init_db, Inventory, Condition
+from service.models import db, init_db, Inventory
 from service.common import status  # HTTP Status Codes
 from tests.factories import InventoryFactory
 
@@ -134,7 +133,7 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item_not_found(self):
-        """ It should return a 204 on deleting an item that is not present in the database""" 
+        """ It should return a 204 on deleting an item that is not present in the database"""
         # make sure item is not present in the database
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -169,7 +168,6 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 5)
 
-
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
@@ -186,7 +184,7 @@ class TestInventoryServer(TestCase):
 
     def test_create_item_wrong_content_type(self):
         """It should not Create an item with wrong content type"""
-        response = self.client.post(BASE_URL, content_type = "text/html")
+        response = self.client.post(BASE_URL, content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_item_bad_restock_level(self):

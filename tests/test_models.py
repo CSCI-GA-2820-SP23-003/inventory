@@ -6,7 +6,6 @@ import os
 import logging
 import unittest
 from datetime import datetime
-from werkzeug.exceptions import NotFound
 from service.models import Inventory, Condition, DataValidationError, db
 from service import app
 from tests.factories import InventoryFactory
@@ -14,6 +13,7 @@ from tests.factories import InventoryFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
+
 
 ######################################################################
 #  YourResourceModel   M O D E L   T E S T   C A S E S
@@ -55,8 +55,8 @@ class TestInventoryModel(unittest.TestCase):
             quantity=5, restock_level=1
         )
         self.assertEqual(
-            str(item), "<Inventory item: id=None, name=Nike shoes," \
-                " condition=Condition.NEW>")
+            str(item), "<Inventory item: id=None, name=Nike shoes,"
+            " condition=Condition.NEW>")
         self.assertTrue(item is not None)
         self.assertEqual(item.id, None)
         self.assertEqual(item.name, "Nike shoes")
@@ -211,7 +211,7 @@ class TestInventoryModel(unittest.TestCase):
     def test_deserialize_missing_data(self):
         """It should not deserialize an Inventory item with missing data"""
         data = {
-            "id": 1, "name": "Adidas T-Shirt", 
+            "id": 1, "name": "Adidas T-Shirt",
             "condition": Condition.OPEN_BOX,
             "quantity": 50
         }

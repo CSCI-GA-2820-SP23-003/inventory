@@ -4,7 +4,8 @@ Inventory Service
 Service is used to manage products in the inventory.
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+# pylint: disable=cyclic-import
+from flask import jsonify, request, url_for, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, DataValidationError
 
@@ -26,11 +27,11 @@ def index():
             version="1.0",
             paths=path,
             endpoints={
-                "DELETE /inventory/<id>" : "Delete an inventory by <id>",
-                "POST   /inventory     " : "Create an inventory",
-                "PUT    /inventory<id> " : "Update an inventory by <id>",
-                "GET    /inventory<id> " : "Read an inventory by <id>",
-                "GET    /inventory     " : "List entire inventory",
+                "DELETE /inventory/<id>": "Delete an inventory by <id>",
+                "POST   /inventory     ": "Create an inventory",
+                "PUT    /inventory<id> ": "Update an inventory by <id>",
+                "GET    /inventory<id> ": "Read an inventory by <id>",
+                "GET    /inventory     ": "List entire inventory",
             },
             usage=f"<endpoints> {path}[/id]"
         ),
@@ -46,7 +47,7 @@ def index():
 # ADD A NEW INVENTORY ITEM
 ######################################################################
 @app.route("/inventory", methods=["POST"])
-def create_inventory_item():#Replace entry with item
+def create_inventory_item():  # Replace entry with item
     """
     Creates an inventory item
     This endpoint will create an item based on the data in the body that is posted
@@ -86,27 +87,26 @@ def get_inventory(inventory_id):
 #  UPDATE AN INVENTORY ITEM
 ######################################################################
 
-@app.route("/inventory/<int:id>", methods=["PUT"])
-def update_inventory(id):
+@app.route("/inventory/<int:inventory_id>", methods=["PUT"])
+def update_inventory(inventory_id):
     """
     Updating an inventory item
     This endpoint will update an item based on the data in the body that is posted
     """
 
-    app.logger.info("Request to update an inventory item with id:%s", id)
+    app.logger.info("Request to update an inventory item with inventory_id:%s", inventory_id)
     check_content_type("application/json")
-    item = Inventory.find(id)
+    item = Inventory.find(inventory_id)
     if not item:
-        abort(status.HTTP_404_NOT_FOUND, "Item with id:%s not found", id)
+        abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s not found", inventory_id)
     try:
         item.deserialize(request.get_json())
-        item.id = id
+        item.id = inventory_id
         item.update()
-    except DataValidationError as err:
+    except DataValidationError:
         abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
 
     return jsonify(item.serialize()), status.HTTP_200_OK
-
 
 
 ######################################################################
@@ -129,6 +129,7 @@ def delete_inventory(inventory_id):
         app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
 
     return "", status.HTTP_204_NO_CONTENT
+
 
 ######################################################################
 # LIST ALL INVENTORY ITEMS
