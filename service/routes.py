@@ -166,7 +166,7 @@ def restock_inventory(inventory_id):
     check_content_type("application/json")
     item = Inventory.find(inventory_id)
     if not item:
-        abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s not found", inventory_id)
+        abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s was not found", inventory_id)
     if item.quantity >= item.restock_level:
         abort(
             status.HTTP_409_CONFLICT,
