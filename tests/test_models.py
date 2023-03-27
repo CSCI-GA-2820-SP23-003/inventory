@@ -264,7 +264,7 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(item.updated_at, items[1].updated_at)
 
     def test_find_by_name(self):
-        """It should Find Inventory items by condition"""
+        """It should Find Inventory items by name"""
         items = InventoryFactory.create_batch(10)
         for item in items:
             item.create()
@@ -274,3 +274,23 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for item in found:
             self.assertEqual(item.name, name)
+
+    def test_find_by_condition(self):
+        """It should find Inventory items by condition"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        condition = items[0].condition
+        count = len([item for item in items if item.condition == condition])
+        found = Inventory.find_by_condition(condition)
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertEqual(item.condition, condition)
+
+    def test_find_by_bad_condition(self):
+        """It should not query Inventory items by a bad condition"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        condition = "damaged"
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, condition)
