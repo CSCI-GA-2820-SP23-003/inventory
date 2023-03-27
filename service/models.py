@@ -184,7 +184,7 @@ class Inventory(db.Model):
         """Returns all Inventory items with the given condition
 
         Args:
-            condition (string): the name of the Inventory item you want to match
+            condition (enum/string): the condition of the Inventory item you want to match
         """
         logger.info("Processing condition query for %s ...", condition)
         try:
