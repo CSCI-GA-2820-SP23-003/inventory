@@ -163,18 +163,17 @@ def restock_inventory(inventory_id):
     inventory item in the database
     """
     app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)
-    check_content_type("application/json")
     item = Inventory.find(inventory_id)
     if not item:
         abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s was not found", inventory_id)
-    if item.quantity >= item.restock_level:
+    if item.quantity > item.restock_level:
         abort(
             status.HTTP_409_CONFLICT,
             "Item with inventory_id:%s is already above the restock level",
             inventory_id
         )
     else:
-        item.quantity = item.restock_level
+        item.quantity = item.restock_level + 1
         item.id = inventory_id
         item.update()
 

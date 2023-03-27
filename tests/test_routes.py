@@ -169,7 +169,7 @@ class TestInventoryServer(TestCase):
         self.assertEqual(len(data), 5)
 
     def test_restock_item(self):
-        """It should successfully restock an existing item"""
+        """It should successfully restock an existing item (quantity < restock_level)"""
         # Create an inventory item
         test_item = InventoryFactory()
         test_item.quantity = 10
@@ -178,16 +178,37 @@ class TestInventoryServer(TestCase):
         response = self.client.post(BASE_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Before restock: quantity < restock_level
+        # Before restock: quantity <= restock_level
         new_item = response.get_json()
         logging.debug("Received Test Inventory Item: %s", new_item)
-        self.assertLess(new_item["quantity"], new_item["restock_level"])
+        self.assertLessEqual(new_item["quantity"], new_item["restock_level"])
 
-        # After restock: quantity == restock_level
-        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock", json={})
+        # After restock: quantity == restock_level + 1
+        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_item = response.get_json()
-        self.assertEqual(updated_item["quantity"], updated_item["restock_level"])
+        self.assertEqual(updated_item["quantity"], updated_item["restock_level"] + 1)
+
+    def test_restock_item_equal(self):
+        """It should successfully restock an existing item (quantity == restock_level)"""
+        # Create an inventory item
+        test_item = InventoryFactory()
+        test_item.quantity = 20
+        test_item.restock_level = 20
+        logging.debug("Test Inventory Item: %s", test_item.serialize())
+        response = self.client.post(BASE_URL, json=test_item.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Before restock: quantity <= restock_level
+        new_item = response.get_json()
+        logging.debug("Received Test Inventory Item: %s", new_item)
+        self.assertEqual(new_item["quantity"], new_item["restock_level"])
+
+        # After restock: quantity == restock_level + 1
+        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_item = response.get_json()
+        self.assertEqual(updated_item["quantity"], updated_item["restock_level"] + 1)
 
     ######################################################################
     #  T E S T   S A D   P A T H S
@@ -272,7 +293,7 @@ class TestInventoryServer(TestCase):
         """It should not restock an item thats not found"""
         test_item = {'id': 34}
         logging.debug("Testing with not exist item: %s", test_item)
-        response = self.client.put(f"{BASE_URL}/{test_item['id']}/restock", json={})
+        response = self.client.put(f"{BASE_URL}/{test_item['id']}/restock")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         logging.debug("Response data = %s", data)
@@ -293,8 +314,8 @@ class TestInventoryServer(TestCase):
         logging.debug("Received Test Inventory Item: %s", new_item)
         self.assertGreater(new_item["quantity"], new_item["restock_level"])
 
-        # After restock: quantity == restock_level
-        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock", json={})
+        # Check HTTP_409_CONFLICT is returned
+        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         data = response.get_json()
         logging.debug("Response data = %s", data)
