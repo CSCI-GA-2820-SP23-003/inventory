@@ -178,3 +178,23 @@ class Inventory(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_condition(cls, condition):
+        """Returns all Inventory items with the given condition
+
+        Args:
+            condition (string): the name of the Inventory item you want to match
+        """
+        logger.info("Processing condition query for %s ...", condition)
+        try:
+            if not isinstance(condition, Condition):
+                query_condition = getattr(Condition, condition)
+            else:
+                query_condition = condition
+        except AttributeError as error:
+            raise DataValidationError(
+                "Invalid condition in query: "
+                + condition
+            ) from error
+        return cls.query.filter(cls.condition == query_condition)
