@@ -158,8 +158,8 @@ def list_inventory_items():
 def restock_inventory(inventory_id):
     """
     Restock an existing inventory item
-    
-    This is an Action as URL that will perform an restock to an existing 
+
+    This is an Action as URL that will perform an restock to an existing
     inventory item in the database
     """
     app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)

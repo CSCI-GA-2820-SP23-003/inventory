@@ -71,7 +71,7 @@ def method_not_supported(error):
     )
 
 
-# Used for restock action: 
+# Used for restock action:
 #   returned if the stock was already above the restock level
 @app.errorhandler(status.HTTP_409_CONFLICT)
 def resource_conflict(error):

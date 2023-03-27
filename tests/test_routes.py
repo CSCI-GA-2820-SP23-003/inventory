@@ -308,4 +308,3 @@ class TestInventoryServer(TestCase):
         self.assertEqual(original_item["condition"], new_item["condition"])
         self.assertEqual(original_item["quantity"], new_item["quantity"])
         self.assertEqual(original_item["restock_level"], new_item["restock_level"])
-        
