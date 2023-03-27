@@ -168,6 +168,27 @@ class TestInventoryServer(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 5)
 
+    def test_restock_item(self):
+        """It should successfully restock an existing item"""
+        # Create an inventory item
+        test_item = InventoryFactory()
+        test_item.quantity = 10
+        test_item.restock_level = 20
+        logging.debug("Test Inventory Item: %s", test_item.serialize())
+        response = self.client.post(BASE_URL, json=test_item.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Before restock: quantity < restock_level
+        new_item = response.get_json()
+        logging.debug("Received Test Inventory Item: %s", new_item)
+        self.assertLess(new_item["quantity"], new_item["restock_level"])
+
+        # After restock: quantity == restock_level
+        response = self.client.put(f"{BASE_URL}/{new_item['id']}/restock", json=new_item)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_item = response.get_json()
+        self.assertEqual(updated_item["quantity"], updated_item["restock_level"])
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
