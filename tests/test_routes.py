@@ -8,8 +8,9 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
-from service.models import db, init_db, Inventory
+from service.models import db, init_db, Inventory, Condition
 from service.common import status  # HTTP Status Codes
 from tests.factories import InventoryFactory
 
@@ -209,6 +210,23 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_item = response.get_json()
         self.assertEqual(updated_item["quantity"], updated_item["restock_level"] + 1)
+    
+    def test_query_item_by_condition(self):
+         """It should Query Inventory Items by Condition Name"""
+         items = self._create_items(10)
+         test_condition = items[0].condition
+         condition_items = [item for item in items if item.condition == test_condition]
+         response = self.client.get(
+             BASE_URL, 
+             query_string =f"condition={quote_plus(test_condition.name)}"
+         )
+         self.assertEqual(response.status_code, status.HTTP_200_OK)
+         data = response.get_json()
+         self.assertEqual(len(data), len(condition_items))
+         # check the data just to be sure
+         for item in data:
+             self.assertEqual(item["condition"], test_condition.name)
+        
 
     ######################################################################
     #  T E S T   S A D   P A T H S

@@ -144,7 +144,12 @@ def list_inventory_items():
     This endpoint will list all inventory items in the database
     """
     app.logger.info("Request to list all inventory items")
-    items = Inventory.all()
+    items = []
+    condition = request.args.get("condition")
+    if condition:
+        items = Inventory.find_by_condition(condition)
+    else:
+        items = Inventory.all()
     results = [item.serialize() for item in items]
     app.logger.info("Returning %d inventory items", len(results))
     return jsonify(results), status.HTTP_200_OK
