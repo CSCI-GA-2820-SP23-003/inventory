@@ -212,20 +212,20 @@ class TestInventoryServer(TestCase):
         self.assertEqual(updated_item["quantity"], updated_item["restock_level"] + 1)
     
     def test_query_item_by_condition(self):
-         """It should Query Inventory Items by Condition Name"""
-         items = self._create_items(10)
-         test_condition = items[0].condition
-         condition_items = [item for item in items if item.condition == test_condition]
-         response = self.client.get(
-             BASE_URL, 
-             query_string =f"condition={quote_plus(test_condition.name)}"
-         )
-         self.assertEqual(response.status_code, status.HTTP_200_OK)
-         data = response.get_json()
-         self.assertEqual(len(data), len(condition_items))
-         # check the data just to be sure
-         for item in data:
-             self.assertEqual(item["condition"], test_condition.name)
+        """It should Query Inventory Items by Condition Name"""
+        items = self._create_items(10)
+        test_condition = items[0].condition
+        condition_items = [item for item in items if item.condition == test_condition]
+        response = self.client.get(
+            BASE_URL, 
+            query_string =f"condition={quote_plus(test_condition.name)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(condition_items))
+        # check the data just to be sure
+        for item in data:
+            self.assertEqual(item["condition"], test_condition.name)
         
 
     ######################################################################
