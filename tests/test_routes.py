@@ -353,3 +353,12 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["status"], "OK")
+
+    def test_query_item_by_condition_wrong_condition(self):
+        """Querying list all with wrong condition should return 400"""
+        test_condition = "OLD"
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"condition={quote_plus(test_condition)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
