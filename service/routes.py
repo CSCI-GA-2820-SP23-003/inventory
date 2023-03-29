@@ -4,7 +4,7 @@ Inventory Service
 Service is used to manage products in the inventory.
 """
 
-# pylint: disable=cyclic-import
+# pylint: disable=cyclic-import, import-error
 from flask import jsonify, request, url_for, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, DataValidationError
