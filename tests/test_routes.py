@@ -346,3 +346,10 @@ class TestInventoryServer(TestCase):
         self.assertEqual(original_item["condition"], new_item["condition"])
         self.assertEqual(original_item["quantity"], new_item["quantity"])
         self.assertEqual(original_item["restock_level"], new_item["restock_level"])
+
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], "OK")
