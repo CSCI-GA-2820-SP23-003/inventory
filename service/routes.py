@@ -16,9 +16,10 @@ from . import app
 ############################################################
 # Health Endpoint
 ############################################################
-@app.route("/health")
+@app.route("/health", methods=["GET"])
 def health():
     """Health Status"""
+    app.logger.info("Request to check health of Kubernetes cluster")
     return {"status": 'OK'}, status.HTTP_200_OK
 
 
