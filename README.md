@@ -47,6 +47,12 @@ tests/              - test cases package
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
 ```
+## Database schema
+"condition": Enum - {NEW, OPEN_BOX, USED},
+"id": Integer,
+"name": String,
+"quantity": Integer,
+"restock_level": Integer
 
 ## Inventory APIs
 
