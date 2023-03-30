@@ -4,6 +4,7 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
+# pylint: disable= import-error
 import sys
 from flask import Flask
 from service import config
@@ -16,7 +17,7 @@ app.config.from_object(config)
 # Dependencies require we import the routes AFTER the Flask app is created
 # pylint: disable=wrong-import-position, wrong-import-order
 from service import routes, models  # noqa: E402, E261
-# pylint: disable=wrong-import-position
+# pylint: disable= wrong-import-position
 from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
 # Set up logging for production

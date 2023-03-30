@@ -15,6 +15,7 @@ quantity (number) - the quantity of the Inventory item
 restock_level (number) - the restock level of the Inventory item
 
 """
+# pylint: disable=import-error, superfluous-parens
 import logging
 from enum import Enum
 from datetime import datetime
