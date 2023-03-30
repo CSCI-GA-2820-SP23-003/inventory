@@ -48,11 +48,12 @@ tests/              - test cases package
 └── test_routes.py  - test suite for service routes
 ```
 ## Database schema
-"condition": Enum - {NEW, OPEN_BOX, USED},
-"id": Integer,
-"name": String,
-"quantity": Integer,
-"restock_level": Integer
+### Each entry will have the following attributes:<br />
+"condition": Enum - {NEW, OPEN_BOX, USED},<br />
+"id": Integer,<br />
+"name": String,<br />
+"quantity": Integer,<br />
+"restock_level": Integer<br />
 
 ## Inventory APIs
 
