@@ -48,12 +48,16 @@ tests/              - test cases package
 └── test_routes.py  - test suite for service routes
 ```
 ## Database schema
-### Each entry will have the following attributes:<br />
-"condition": Enum - {NEW, OPEN_BOX, USED},<br />
-"id": Integer,<br />
-"name": String,<br />
-"quantity": Integer,<br />
-"restock_level": Integer<br />
+
+| Field       | Type        | Description | Primary Key |
+| ----------- | ----------- | ----------- | ----------- |
+| id      | Integer       | ID of entry            | Yes            |
+| name      | String       | Name of product            | No            |
+| condition   | Enum {NEW, OPEN_BOX, USED}        | Condition of entry            | No            |
+| quantity   | Integer        | Quantity of entry            | No            |
+| restock_level   | Integer        | Restock level of product            | No            |
+| created_at   | Date        | Date of creation of entry            | No            |
+| updation_at   | Date        | Date of updation of entry            | No            |
 
 ## Inventory APIs
 
