@@ -51,13 +51,13 @@ tests/              - test cases package
 
 | Field       | Type        | Description | Primary Key |
 | ----------- | ----------- | ----------- | ----------- |
-| id      | Integer       | ID of entry            | Yes            |
-| name      | String       | Name of product            | No            |
-| condition   | Enum {NEW, OPEN_BOX, USED}        | Condition of entry            | No            |
-| quantity   | Integer        | Quantity of entry            | No            |
-| restock_level   | Integer        | Restock level of product            | No            |
-| created_at   | Date        | Date of creation of entry            | No            |
-| updation_at   | Date        | Date of updation of entry            | No            |
+| id      | Integer       | ID of item            | Yes            |
+| name      | String       | Name of item            | No            |
+| condition   | Enum {NEW, OPEN_BOX, USED}        | Condition of item            | No            |
+| quantity   | Integer        | Quantity of item            | No            |
+| restock_level   | Integer        | Restock level of item            | No            |
+| created_at   | Date        | Date of creation of item            | No            |
+| updation_at   | Date        | Date of updation of item            | No            |
 
 ## Inventory APIs
 
