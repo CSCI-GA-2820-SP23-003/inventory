@@ -56,7 +56,7 @@ tests/              - test cases package
 | condition   | Enum {NEW, OPEN_BOX, USED}        | Condition of item            | No            |
 | quantity   | Integer        | Quantity of item            | No            |
 | restock_level   | Integer        | Restock level of item            | No            |
-| created_at   | Date        | Date of creation of item            | No            |
+| created_at   | DateTime        | Time of creation of item            | No            |
 | updation_at   | Date        | Date of updation of item            | No            |
 
 ## Inventory APIs
