@@ -57,7 +57,7 @@ tests/              - test cases package
 | quantity   | Integer        | Quantity of item            | No            |
 | restock_level   | Integer        | Restock level of item            | No            |
 | created_at   | DateTime        | Time of creation of item            | No            |
-| updation_at   | Date        | Date of updation of item            | No            |
+| updated_at   | DateTime        | Time of updation of item            | No            |
 
 ## Inventory APIs
 
