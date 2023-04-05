@@ -39,8 +39,8 @@ def index():
             endpoints={
                 "DELETE /inventory/<id>": "Delete an inventory by <id>",
                 "POST   /inventory     ": "Create an inventory",
-                "PUT    /inventory<id> ": "Update an inventory by <id>",
-                "GET    /inventory<id> ": "Read an inventory by <id>",
+                "PUT    /inventory/<id>": "Update an inventory by <id>",
+                "GET    /inventory/<id>": "Read an inventory by <id>",
                 "GET    /inventory     ": "List entire inventory",
             },
             usage=f"<endpoints> {path}[/id]"
