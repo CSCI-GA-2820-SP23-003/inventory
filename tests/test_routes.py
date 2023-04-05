@@ -79,8 +79,8 @@ class TestInventoryServer(TestCase):
         self.assertIn("endpoints", data)
         self.assertIn("usage", data)
         self.assertIn("POST   /inventory     ", data["endpoints"])
-        self.assertIn("PUT    /inventory<id> ", data["endpoints"])
-        self.assertIn("GET    /inventory<id> ", data["endpoints"])
+        self.assertIn("PUT    /inventory/<id>", data["endpoints"])
+        self.assertIn("GET    /inventory/<id>", data["endpoints"])
         self.assertIn("DELETE /inventory/<id>", data["endpoints"])
         self.assertIn("GET    /inventory     ", data["endpoints"])
 
