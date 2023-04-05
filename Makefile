@@ -1,12 +1,12 @@
 # These can be overidden with env vars.
 REGISTRY ?= us.icr.io
-NAMESPACE ?= nyu-devops-inventory
+NAMESPACE ?= nyu-inventory
 IMAGE_NAME ?= inventory
 IMAGE_TAG ?= 1.0
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
 # PLATFORM ?= "linux/amd64,linux/arm64"
 PLATFORM ?= "linux/amd64"
-CLUSTER ?= nyu-devops
+CLUSTER ?= inventory
 
 .PHONY: help
 help: ## Display this help
@@ -71,6 +71,7 @@ login: ## Login to IBM Cloud using yur api key
 deploy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
 	kubectl apply -f deploy/
+
 
 ############################################################
 # COMMANDS FOR BUILDING THE IMAGE
