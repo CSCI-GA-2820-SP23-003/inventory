@@ -209,7 +209,11 @@ class Inventory(db.Model):
 
     @classmethod
     def find_by_restock_level(cls, restock):
-        """Returns all inventory items"""
+        """Returns all inventory items that need to or don't need to be restocked
+
+        Args:
+            restock (string): true/false
+        """
         logger.info("Processing query for restock condition %s ...", restock)
         restock_bool = getattr(RestockQueryString, restock)
         if restock_bool:
