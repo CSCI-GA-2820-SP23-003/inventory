@@ -45,13 +45,6 @@ class Condition(Enum):
     USED = 2
 
 
-class RestockQueryString():
-    """Valid choices for restock query string"""
-
-    true = True
-    false = False
-
-
 def updated_at_default(context):
     """ Initializes the created_at time """
     return context.get_current_parameters()["created_at"]
@@ -215,7 +208,6 @@ class Inventory(db.Model):
             restock (string): true/false
         """
         logger.info("Processing query for restock condition %s ...", restock)
-        restock_bool = getattr(RestockQueryString, restock)
-        if restock_bool:
+        if restock == "true":
             return cls.query.filter(cls.quantity <= cls.restock_level)
         return cls.query.filter(cls.quantity > cls.restock_level)
