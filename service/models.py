@@ -45,6 +45,13 @@ class Condition(Enum):
     USED = 2
 
 
+class RestockQueryString():
+    """Valid choices for restock query string"""
+
+    true = True
+    false = False
+
+
 def updated_at_default(context):
     """ Initializes the created_at time """
     return context.get_current_parameters()["created_at"]
@@ -199,3 +206,11 @@ class Inventory(db.Model):
                 + condition
             ) from error
         return cls.query.filter(cls.condition == query_condition)
+
+    @classmethod
+    def find_by_restock_level(cls, restock):
+        """Returns all inventory items"""
+        restock_bool = getattr(RestockQueryString, restock)
+        if restock_bool:
+            return cls.query.filter(cls.quantity <= cls.restock_level)
+        return cls.query.filter(cls.quantity > cls.restock_level)
