@@ -412,7 +412,7 @@ class TestInventoryServer(TestCase):
     def test_query_item_by_quantity_invalid_quantity(self):
         """Querying list all with invalid quantity should return 400"""
         test_quantity_list = [
-            "damage", "-100", "+100", "d123", "d", 
+            "damage", "-100", "+100", "d123", "d",
             "134.42", "134.00", ".134", "134d"
         ]
         for test_quantity in test_quantity_list:

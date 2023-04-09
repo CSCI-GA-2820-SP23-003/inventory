@@ -223,4 +223,3 @@ class Inventory(db.Model):
         if not quantity.isdigit():
             raise DataValidationError("Invalid quantity in query: " + str(quantity))
         return cls.query.filter(cls.quantity == int(quantity))
-    

@@ -4,7 +4,6 @@ Test cases for Inventory Model
 """
 import os
 import logging
-import random
 import unittest
 from datetime import datetime
 from service.models import Inventory, Condition, DataValidationError, db
