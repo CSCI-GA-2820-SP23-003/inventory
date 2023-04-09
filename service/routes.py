@@ -162,8 +162,7 @@ def list_inventory_items():
         items = Inventory.find_by_condition(condition)
     elif restock:
         items = Inventory.find_by_restock_level(restock)
-    elif quantity is not None: 
-        # The case where quantity query is an empty string is handled in models.py
+    elif quantity:
         items = Inventory.find_by_quantity(quantity)
     else:
         items = Inventory.all()
