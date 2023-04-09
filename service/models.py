@@ -211,3 +211,15 @@ class Inventory(db.Model):
         if restock == "true":
             return cls.query.filter(cls.quantity <= cls.restock_level)
         return cls.query.filter(cls.quantity > cls.restock_level)
+
+    @classmethod
+    def find_by_quantity(cls, quantity):
+        """Returns all inventory items with the given quantity
+
+        Args:
+            quantity (string): a string that must be able to be converted into an integer
+        """
+        logger.info("Processing quantity query for %s ...", quantity)
+        if not quantity.isdigit():
+            raise DataValidationError("Invalid quantity in query: " + str(quantity))
+        return cls.query.filter(cls.quantity == int(quantity))

@@ -157,10 +157,13 @@ def list_inventory_items():
     items = []
     condition = request.args.get("condition")
     restock = request.args.get("restock")
+    quantity = request.args.get("quantity")
     if condition:
         items = Inventory.find_by_condition(condition)
     elif restock:
         items = Inventory.find_by_restock_level(restock)
+    elif quantity:
+        items = Inventory.find_by_quantity(quantity)
     else:
         items = Inventory.all()
     results = [item.serialize() for item in items]

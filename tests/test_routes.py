@@ -257,6 +257,22 @@ class TestInventoryServer(TestCase):
         for item in data:
             self.assertGreater(item["quantity"], item["restock_level"])
 
+    def test_query_item_by_quantity(self):
+        """It should Query Inventory Items by quantity"""
+        items = self._create_items(10)
+        test_quantity = items[0].quantity
+        quantity_items = [item for item in items if item.quantity == test_quantity]
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"quantity={quote_plus(str(test_quantity))}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(quantity_items))
+        # check the data just to be sure
+        for item in data:
+            self.assertEqual(item["quantity"], test_quantity)
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
@@ -392,3 +408,16 @@ class TestInventoryServer(TestCase):
             query_string=f"condition={quote_plus(test_condition)}"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_query_item_by_quantity_invalid_quantity(self):
+        """Querying list all with invalid quantity should return 400"""
+        test_quantity_list = [
+            "damage", "-100", "+100", "d123", "d",
+            "134.42", "134.00", ".134", "134d"
+        ]
+        for test_quantity in test_quantity_list:
+            response = self.client.get(
+                BASE_URL,
+                query_string=f"quantity={quote_plus(test_quantity)}"
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
