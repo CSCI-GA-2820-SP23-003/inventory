@@ -156,8 +156,11 @@ def list_inventory_items():
     app.logger.info("Request to list all inventory items")
     items = []
     condition = request.args.get("condition")
+    restock = request.args.get("restock")
     if condition:
         items = Inventory.find_by_condition(condition)
+    elif restock:
+        items = Inventory.find_by_restock_level(restock)
     else:
         items = Inventory.all()
     results = [item.serialize() for item in items]

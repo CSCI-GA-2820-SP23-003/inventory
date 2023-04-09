@@ -294,3 +294,25 @@ class TestInventoryModel(unittest.TestCase):
             item.create()
         condition = "damaged"
         self.assertRaises(DataValidationError, Inventory.find_by_condition, condition)
+
+    def test_find_items_to_restock(self):
+        """It should find Inventory items that need to be restocked"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        count = len([item for item in items if item.quantity <= item.restock_level])
+        found = Inventory.find_by_restock_level("true")
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertLessEqual(item.quantity, item.restock_level)
+
+    def test_find_items_to_not_restock(self):
+        """It should find Inventory items that don't need to be restocked"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        count = len([item for item in items if item.quantity > item.restock_level])
+        found = Inventory.find_by_restock_level("false")
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertGreater(item.quantity, item.restock_level)

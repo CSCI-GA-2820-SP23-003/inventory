@@ -199,3 +199,15 @@ class Inventory(db.Model):
                 + condition
             ) from error
         return cls.query.filter(cls.condition == query_condition)
+
+    @classmethod
+    def find_by_restock_level(cls, restock):
+        """Returns all inventory items that need to or don't need to be restocked
+
+        Args:
+            restock (string): true/false
+        """
+        logger.info("Processing query for restock condition %s ...", restock)
+        if restock == "true":
+            return cls.query.filter(cls.quantity <= cls.restock_level)
+        return cls.query.filter(cls.quantity > cls.restock_level)

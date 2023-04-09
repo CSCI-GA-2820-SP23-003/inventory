@@ -32,4 +32,4 @@ class InventoryFactory(factory.Factory):
     name = FuzzyChoice(choices=INVENTORY_ITEM_NAMES)
     condition = FuzzyChoice(choices=[Condition.NEW, Condition.OPEN_BOX, Condition.USED])
     quantity = FuzzyInteger(10000)
-    restock_level = FuzzyInteger(10)
+    restock_level = FuzzyInteger(5000)

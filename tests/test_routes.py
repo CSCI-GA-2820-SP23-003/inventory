@@ -227,6 +227,36 @@ class TestInventoryServer(TestCase):
         for item in data:
             self.assertEqual(item["condition"], test_condition.name)
 
+    def test_query_items_to_restock(self):
+        """It should Query Inventory Items that need to be Restocked"""
+        items = self._create_items(10)
+        restock_items = [item for item in items if item.quantity <= item.restock_level]
+        restock_condition = "true"
+        response = self.client.get(
+            BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(restock_items))
+        print(len(data), len(restock_items))
+        for item in data:
+            self.assertLessEqual(item["quantity"], item["restock_level"])
+
+    def test_query_items_to_not_restock(self):
+        """It should Query Inventory Items that don't need to be Restocked"""
+        items = self._create_items(10)
+        restock_items = [item for item in items if item.quantity > item.restock_level]
+        restock_condition = "false"
+        response = self.client.get(
+            BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(restock_items))
+        print(len(data), len(restock_items))
+        for item in data:
+            self.assertGreater(item["quantity"], item["restock_level"])
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
