@@ -344,7 +344,7 @@ class TestInventoryModel(unittest.TestCase):
         for item in found:
             self.assertEqual(item.quantity, target_quantity)
 
-    def test_find_by_quantity_invalid_query(self):
+    def test_find_by_quantity_invalid_quantity(self):
         """It should not query Inventory items by a invalid quantity"""
         items = InventoryFactory.create_batch(10)
         for item in items:
@@ -358,3 +358,4 @@ class TestInventoryModel(unittest.TestCase):
         self.assertRaises(DataValidationError, Inventory.find_by_condition, "134.00")
         self.assertRaises(DataValidationError, Inventory.find_by_condition, ".134")
         self.assertRaises(DataValidationError, Inventory.find_by_condition, "134d")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "")
