@@ -4,6 +4,7 @@ Test cases for Inventory Model
 """
 import os
 import logging
+import random
 import unittest
 from datetime import datetime
 from service.models import Inventory, Condition, DataValidationError, db
@@ -316,3 +317,44 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for item in found:
             self.assertGreater(item.quantity, item.restock_level)
+
+    def test_find_by_quantity(self):
+        """It should Find Inventory items by quantity"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        target_quantity = items[0].quantity
+        count = len([item for item in items if item.quantity == target_quantity])
+        found = Inventory.find_by_quantity(str(target_quantity))
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertEqual(item.quantity, target_quantity)
+
+    def test_find_by_quantity_multiple(self):
+        """It should Find Inventory items by quantity: multiple match"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        target_quantity = items[0].quantity
+        items[2].quantity = target_quantity
+        items[5].quantity = target_quantity
+        count = len([item for item in items if item.quantity == target_quantity])
+        found = Inventory.find_by_quantity(str(target_quantity))
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertEqual(item.quantity, target_quantity)
+
+    def test_find_by_quantity_invalid_query(self):
+        """It should not query Inventory items by a invalid quantity"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "damaged")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "-100")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "+100")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "d134")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "d")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "134.42")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "134.00")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, ".134")
+        self.assertRaises(DataValidationError, Inventory.find_by_condition, "134d")
