@@ -273,6 +273,22 @@ class TestInventoryServer(TestCase):
         for item in data:
             self.assertEqual(item["quantity"], test_quantity)
 
+    def test_query_item_by_name(self):
+        """It should Query Inventory Items by Name"""
+        items = self._create_items(10)
+        test_name = items[0].name
+        name_items = [item for item in items if item.name == test_name]
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"name={quote_plus(test_name)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), len(name_items))
+        # check the data just to be sure
+        for item in data:
+            self.assertEqual(item["name"], test_name)
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
