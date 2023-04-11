@@ -30,23 +30,7 @@ def health():
 def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
-    path = url_for('create_inventory_item', _external=True)
-    return (
-        jsonify(
-            name="Inventory REST API Service",
-            version="1.0",
-            paths=path,
-            endpoints={
-                "DELETE /inventory/<id>": "Delete an inventory by <id>",
-                "POST   /inventory     ": "Create an inventory",
-                "PUT    /inventory/<id>": "Update an inventory by <id>",
-                "GET    /inventory/<id>": "Read an inventory by <id>",
-                "GET    /inventory     ": "List entire inventory",
-            },
-            usage=f"<endpoints> {path}[/id]"
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 ######################################################################

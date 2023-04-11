@@ -21,7 +21,7 @@ with open('tests/fixtures/inventory_item_names.csv', newline='') as csvfile:
 
 
 class InventoryFactory(factory.Factory):
-    """Creates fake pets that you don't have to feed"""
+    """Creates fake items"""
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
