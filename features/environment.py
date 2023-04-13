@@ -16,7 +16,7 @@ def before_all(context):
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")  # Bypass OS security model
     options.add_argument("--headless")
-    context.driver = webdriver.Chrome(options=options)
+    context.driver = webdriver.Chrome(options=options)#Error!
     context.driver.implicitly_wait(context.WAIT_SECONDS)  # seconds
     # -- SET LOG LEVEL: behave --logging-level=ERROR ...
     # on behave command-line or in "behave.ini"

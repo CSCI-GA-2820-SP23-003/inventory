@@ -25,13 +25,10 @@ def step_impl(context):
     # load the database with new items
     for row in context.table:
         payload = {
-            "id": row['id'],
             "name": row['name'],
             "condition": row['condition'],
-            "quantity": row['quantity'],
-            "restock_level": row['restock_level'],
-            "created_at": row['created_at'],
-            "updated_at": row['updated_at']
+            "quantity": int(row['quantity']),
+            "restock_level": int(row['restock_level'])
         }
         context.resp = requests.post(rest_endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)
