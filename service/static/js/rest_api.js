@@ -77,3 +77,30 @@ $(function () {
         });
     });
 })
+
+    // ****************************************
+    // Delete a Pet
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+
+        let inventory_id = $("#inventory_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/inventory/${inventory_id}`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Item has been Deleted!")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
