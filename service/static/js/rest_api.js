@@ -77,28 +77,6 @@ $(function () {
         });
     });
 
-    $("#restock-btn").click(function () {
-        let id = $("#inventory_id").val();
-
-        $("#flash_message").empty();
-
-        let ajax = $.ajax({
-            type: "PUT",
-            url: "/inventory/".concat(id, "/restock"),
-        });
-
-        ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
-        });
-
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
-
-    });
-})
-
     // ****************************************
     // Delete a Pet
     // ****************************************
@@ -125,3 +103,4 @@ $(function () {
             flash_message("Server error!")
         });
     });
+})
