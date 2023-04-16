@@ -214,4 +214,14 @@ $(function () {
         });
         
     });
+
+    // ****************************************
+    // Clear the form
+    // ****************************************
+    
+    $("#clear-btn").click(function () {
+        $("#pet_id").val("");
+        $("#flash_message").empty();
+        clear_form_data()
+    });
 })
