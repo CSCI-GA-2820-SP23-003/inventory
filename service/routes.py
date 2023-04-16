@@ -5,7 +5,7 @@ Service is used to manage products in the inventory.
 """
 
 # pylint: disable=cyclic-import, import-error
-from flask import jsonify, request, url_for, abort
+from flask import jsonify, request, url_for, make_response, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, DataValidationError
 
@@ -120,11 +120,10 @@ def delete_inventory(inventory_id):
     if inventory:
         inventory.delete()
         app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
-
     else:
         app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
 
-    return "", status.HTTP_204_NO_CONTENT
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
