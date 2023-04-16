@@ -204,9 +204,10 @@ $(function () {
             // copy the first result to the form
             if (firstItem != "") {
                 update_form_data(firstItem)
+                flash_message("Success")
+            }else{
+                flash_message("No items found")
             }
-
-            flash_message("Success")
         });
 
         ajax.fail(function(res){
