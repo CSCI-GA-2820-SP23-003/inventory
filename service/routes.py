@@ -94,7 +94,7 @@ def update_inventory(inventory_id):
     check_content_type("application/json")
     item = Inventory.find(inventory_id)
     if not item:
-        abort(status.HTTP_404_NOT_FOUND, "Item with inventory_id:%s not found", inventory_id)
+        abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} not found")
     try:
         item.deserialize(request.get_json())
         item.id = inventory_id
