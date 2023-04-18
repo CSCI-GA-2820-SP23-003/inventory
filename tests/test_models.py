@@ -3,6 +3,7 @@ Test cases for Inventory Model
 
 """
 import os
+import random
 import logging
 import unittest
 from datetime import datetime
@@ -301,7 +302,8 @@ class TestInventoryModel(unittest.TestCase):
         for item in items:
             item.create()
         count = len([item for item in items if item.quantity <= item.restock_level])
-        found = Inventory.find_by_restock_level("true")
+        restock_string = random.choice(["true", "True"])
+        found = Inventory.find_by_restock_level(restock_string)
         self.assertEqual(found.count(), count)
         for item in found:
             self.assertLessEqual(item.quantity, item.restock_level)
@@ -312,10 +314,21 @@ class TestInventoryModel(unittest.TestCase):
         for item in items:
             item.create()
         count = len([item for item in items if item.quantity > item.restock_level])
-        found = Inventory.find_by_restock_level("false")
+        restock_string = random.choice(["false", "False"])
+        found = Inventory.find_by_restock_level(restock_string)
         self.assertEqual(found.count(), count)
         for item in found:
             self.assertGreater(item.quantity, item.restock_level)
+
+    def test_find_by_bad_restock_string(self):
+        """It should not Query Inventory items by an invalid restock string"""
+        items = InventoryFactory.create_batch(10)
+        for item in items:
+            item.create()
+        self.assertRaises(DataValidationError, Inventory.find_by_restock_level, "34")
+        self.assertRaises(DataValidationError, Inventory.find_by_restock_level, "34.01")
+        self.assertRaises(DataValidationError, Inventory.find_by_restock_level, "yes")
+        self.assertRaises(DataValidationError, Inventory.find_by_restock_level, "no")
 
     def test_find_by_quantity(self):
         """It should Find Inventory items by quantity"""

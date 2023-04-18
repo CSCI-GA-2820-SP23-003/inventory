@@ -6,6 +6,7 @@ Test cases can be run with the following:
   coverage report -m
 """
 import os
+import random
 import logging
 from unittest import TestCase
 from urllib.parse import quote_plus
@@ -222,7 +223,7 @@ class TestInventoryServer(TestCase):
         """It should Query Inventory Items that need to be Restocked"""
         items = self._create_items(10)
         restock_items = [item for item in items if item.quantity <= item.restock_level]
-        restock_condition = "true"
+        restock_condition = random.choice(["true", "True"])
         response = self.client.get(
             BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
         )
@@ -237,7 +238,7 @@ class TestInventoryServer(TestCase):
         """It should Query Inventory Items that don't need to be Restocked"""
         items = self._create_items(10)
         restock_items = [item for item in items if item.quantity > item.restock_level]
-        restock_condition = "false"
+        restock_condition = random.choice(["false", "False"])
         response = self.client.get(
             BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
         )
@@ -426,5 +427,15 @@ class TestInventoryServer(TestCase):
             response = self.client.get(
                 BASE_URL,
                 query_string=f"quantity={quote_plus(test_quantity)}"
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_bad_restock_query_string(self):
+        """Querying list all with values other than true/True or false/False should return 400"""
+        test_restock_string_list = ["34", "34.01", "yes", "no"]
+        for test_restock_string in test_restock_string_list:
+            response = self.client.get(
+                BASE_URL,
+                query_string=f"restock={quote_plus(test_restock_string)}"
             )
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -205,10 +205,12 @@ class Inventory(db.Model):
         """Returns all inventory items that need to or don't need to be restocked
 
         Args:
-            restock (string): true/false
+            restock (string): true/True/false/False
         """
         logger.info("Processing query for restock condition %s ...", restock)
-        if restock == "true":
+        if restock not in ["true", "True", "false", "False"]:
+            raise DataValidationError("Invalid restock query string: " + str(restock))
+        if restock in ["true", "True"]:
             return cls.query.filter(cls.quantity <= cls.restock_level)
         return cls.query.filter(cls.quantity > cls.restock_level)
 
