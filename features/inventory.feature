@@ -54,3 +54,11 @@ Scenario: Do not List inventory items which are not present
     Then I should see the message "Success"
     And I should not see "cheezeit" in the results
 
+Scenario: Search for inventory items by Name
+    When I visit the "home page"
+    And I set the "Name" to "lays"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "lays" in the results
+    And I should not see "cheetos" in the results
+    And I should not see "doritos" in the results
