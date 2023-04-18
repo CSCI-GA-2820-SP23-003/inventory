@@ -301,4 +301,8 @@ $(function () {
         $("#flash_message").empty();
         clear_form_data()
     });
+
+    $("search-btn").onmouseover = function showHint() {
+        console.log("reached")
+    }
 })
