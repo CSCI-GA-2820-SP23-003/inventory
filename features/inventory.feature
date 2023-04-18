@@ -15,6 +15,28 @@ Scenario: The server is running
     Then I should see "Inventory RESTful Service" in the title
     And I should not see "404 Not Found"
 
+Scenario: Create an Inventory Item
+    When I visit the "home page"
+    And I set the "Name" to "TestCreate"
+    And I select "New" in the "Condition" dropdown
+    And I set the "Quantity" to "10"
+    And I set the "Restock Level" to "20"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "TestCreate" in the "Name" field
+    And I should see "New" in the "Condition" dropdown
+    And I should see "10" in the "Quantity" field
+    And I should see "20" in the "Restock Level" field
+
 Scenario: List all inventory items
     When I visit the "home page"
     And I press the "search" button
@@ -31,3 +53,4 @@ Scenario: Do not List inventory items which are not present
     And I press the "search" button
     Then I should see the message "Success"
     And I should not see "cheezeit" in the results
+
