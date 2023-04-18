@@ -53,7 +53,8 @@
               <label class="control-label col-sm-2" for="inventory_condition">Condition:</label>
               <div class="col-sm-10">
                 <select class="form-control" id="inventory_condition">
-                  <option value="NEW" selected>New</option>
+                  <option value="" selected>Choose Item Condition</option>
+                  <option value="NEW">New</option>
                   <option value="OPEN_BOX">Open Box</option>
                   <option value="USED">Used</option>
                 </select>
@@ -74,13 +75,16 @@
               <label class="control-label col-sm-2" for="inventory_restock_level">Restock Level:</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="inventory_restock_level" placeholder="Enter restock level for item">
+                <div id="hint" style="padding-top: 5px; padding-left: 5px; visibility: hidden;">
+                  <span style="color: rgb(206, 96, 23);">While searchinig, restock level accepts true/True or false/False</span>
+                </div>
               </div>
             </div>
 
             <!-- SUBMIT BUTTONS -->
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                <button type="submit" class="btn btn-primary" id="search-btn" onmouseover="showHint()" onmouseout="hideHint()">Search</button>
                 <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
                 <button type="submit" class="btn btn-success" id="create-btn">Create</button>
                 <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
@@ -101,8 +105,6 @@
             <th class="col-md-2">Condition</th>
             <th class="col-md-1">Quantity</th>
             <th class="col-md-1">Restock Level</th>
-            <th class="col-md-3">Created At</th>
-            <th class="col-md-3">Updated At</th>
           </tr>
           </thead>
         </table>
@@ -120,6 +122,14 @@
 
   <!-- YOUR REST API -->
   <script type="text/javascript" src="static/js/rest_api.js"></script>
+  <script>
+    function showHint(){
+      document.getElementById("hint").style.visibility = 'visible';
+    }
+    function hideHint(){
+      document.getElementById("hint").style.visibility = 'hidden';
+    }
+  </script>
 
   </body>
 </html>
