@@ -62,3 +62,34 @@ Scenario: Search for inventory items by Name
     And I should see "lays" in the results
     And I should not see "cheetos" in the results
     And I should not see "doritos" in the results
+
+Scenario: Search for inventory items by Condition
+    When I visit the "home page"
+    And I select "New" in the "Condition" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "cheetos" in the results
+    And I should not see "lays" in the results
+    And I should not see "doritos" in the results
+    When I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I select "Open Box" in the "Condition" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "lays" in the results
+    And I should not see "cheetos" in the results
+    And I should not see "doritos" in the results
+    When I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I select "Used" in the "Condition" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "doritos" in the results
+    And I should not see "cheetos" in the results
+    And I should not see "lays" in the results
