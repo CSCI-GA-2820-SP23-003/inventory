@@ -113,3 +113,15 @@ Scenario: Search for inventory items by Quantity
     And I should see "lays" in the results
     And I should not see "cheetos" in the results
     And I should not see "doritos" in the results
+
+Scenario: Invalid query for Search by Restock Level
+    When I visit the "home page"
+    And I set the "Restock Level" to "12"
+    And I press the "Search" button
+    Then I should see the message "Invalid restock query string"
+
+Scenario: Invalid query for Search by Quantity
+    When I visit the "home page"
+    And I set the "Quantity" to "awesome"
+    And I press the "Search" button
+    Then I should see the message "Invalid quantity in query"
