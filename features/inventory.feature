@@ -31,3 +31,25 @@ Scenario: Do not List inventory items which are not present
     And I press the "search" button
     Then I should see the message "Success"
     And I should not see "cheezeit" in the results
+
+Scenario: Update an Inventory Item
+    When I visit the "home page"
+    And I set the "Name" to "cheetos"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "cheetos" in the "Name" field
+    And I should see "NEW" in the "Condition" field
+    When I change "Name" to "pringles"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "pringles" in the "Name" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "pringles" in the results
+    And I should not see "cheetos" in the results
