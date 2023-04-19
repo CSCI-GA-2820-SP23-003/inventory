@@ -262,3 +262,25 @@ Scenario: Invalid query for Search by Quantity
     And I set the "Quantity" to "-100"
     And I press the "Search" button
     Then I should see the message "Invalid quantity in query"
+
+Scenario: Delete an Inventory Item
+    When I visit the "home page"
+    And I set the "Name" to "TestCreate"
+    And I select "New" in the "Condition" dropdown
+    And I set the "Quantity" to "10"
+    And I set the "Restock Level" to "20"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I paste the "Id" field
+    And I press the "Delete" button
+    Then I should see the message "Item has been Deleted!"
+    When I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "404 Not Found"
+    
