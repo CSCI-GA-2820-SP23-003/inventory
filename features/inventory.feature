@@ -54,6 +54,67 @@ Scenario: Do not List inventory items which are not present
     Then I should see the message "Success"
     And I should not see "cheezeit" in the results
 
+Scenario: Update an Inventory Item
+    When I visit the "home page"
+    And I set the "Name" to "cheetos"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "cheetos" in the "Name" field
+    And I should see "NEW" in the "Condition" field
+    When I change "Name" to "pringles"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "pringles" in the "Name" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "pringles" in the results
+    And I should not see "cheetos" in the results
+
+Scenario: Restock an Inventory Item
+    When I visit the "home page"
+    And I set the "Name" to "TestCreate"
+    And I select "New" in the "Condition" dropdown
+    And I set the "Quantity" to "10"
+    And I set the "Restock Level" to "20"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I paste the "Id" field
+    And I press the "Restock" button
+    Then I should see the message "Success"
+    And I should see "TestCreate" in the "Name" field
+    And I should see "New" in the "Condition" dropdown
+    And I should see "21" in the "Quantity" field
+    And I should see "20" in the "Restock Level" field
+
+Scenario: Do not Restock an Inventory Item which is above the restock level
+    When I visit the "home page"
+    And I set the "Name" to "TestCreate"
+    And I select "New" in the "Condition" dropdown
+    And I set the "Quantity" to "10"
+    And I set the "Restock Level" to "9"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "Name" field should be empty
+    And the "Quantity" field should be empty
+    And the "Restock Level" field should be empty
+    When I paste the "Id" field
+    And I press the "Restock" button
+    Then I should see the message "409 Conflict"
 Scenario: Search for inventory items by Name
     When I visit the "home page"
     And I set the "Name" to "lays"
