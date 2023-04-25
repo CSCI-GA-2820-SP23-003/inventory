@@ -45,7 +45,7 @@ create_model = api.model('Inventory', {
                                     description='The restock level of an inventory item'),
 })
 
-pet_model = api.inherit(
+inventory_model = api.inherit(
     'InventoryModel', 
     create_model,
     {
@@ -56,7 +56,6 @@ pet_model = api.inherit(
 
 # query string arguments
 pet_args = reqparse.RequestParser()
-
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
