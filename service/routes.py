@@ -6,11 +6,12 @@ Service is used to manage products in the inventory.
 
 # pylint: disable=cyclic-import, import-error
 from flask import jsonify, request, url_for, make_response, abort
+from flask_restx import Api, Resource, fields, reqparse, inputs
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory, DataValidationError
+from service.models import Inventory, DataValidationError, Condition
 
 # Import Flask application
-from . import app
+from . import app, api
 
 
 ############################################################
@@ -31,6 +32,30 @@ def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
     return app.send_static_file("index.html")
+
+# Define the model so that the docs reflect what can be sent
+create_model = api.model('Inventory', {
+    'name': fields.String(required=True,
+                          description='The name of the Pet'),
+    'condition': fields.String(required=True, enum=Condition._member_names_,
+                               description='The condition of inventory (NEW, OPEN_BOX, USED)'),
+    'quantity': fields.Integer(required=True,
+                               description='The quantity of an inventory item'),
+    'restock_level': fields.Integer(required=True,
+                                    description='The restock level of an inventory item'),
+})
+
+pet_model = api.inherit(
+    'InventoryModel', 
+    create_model,
+    {
+        'id': fields.String(readOnly=True,
+                            description='The unique id assigned internally by service'),
+    }
+)
+
+# query string arguments
+pet_args = reqparse.RequestParser()
 
 
 ######################################################################
