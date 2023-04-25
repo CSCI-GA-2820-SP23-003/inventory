@@ -6,7 +6,7 @@ Service is used to manage products in the inventory.
 
 # pylint: disable=cyclic-import, import-error
 from flask import jsonify, request, url_for, make_response, abort
-from flask_restx import Api, Resource, fields, reqparse, inputs
+from flask_restx import fields, reqparse  # TODO: add Api, Resource, inputs.
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, DataValidationError, Condition
 
@@ -33,6 +33,7 @@ def index():
     app.logger.info("Request for Root URL")
     return app.send_static_file("index.html")
 
+
 # Define the model so that the docs reflect what can be sent
 create_model = api.model('Inventory', {
     'name': fields.String(required=True,
@@ -46,7 +47,7 @@ create_model = api.model('Inventory', {
 })
 
 inventory_model = api.inherit(
-    'InventoryModel', 
+    'InventoryModel',
     create_model,
     {
         'id': fields.String(readOnly=True,

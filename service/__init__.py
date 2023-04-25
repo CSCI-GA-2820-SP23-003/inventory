@@ -24,9 +24,9 @@ api = Api(app,
           description='This is the Inventory server.',
           default='inventory',
           default_label='Inventory item operations',
-          doc='/apidocs', # default also could use doc='/apidocs/'
+          doc='/apidocs',  # default also could use doc='/apidocs/'
           prefix='/api'
-         )
+)
 
 # Dependencies require we import the routes AFTER the Flask app is created
 # pylint: disable=wrong-import-position, wrong-import-order
