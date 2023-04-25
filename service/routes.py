@@ -36,7 +36,7 @@ def index():
 # Define the model so that the docs reflect what can be sent
 create_model = api.model('Inventory', {
     'name': fields.String(required=True,
-                          description='The name of the Pet'),
+                          description='The name of the inventory item'),
     'condition': fields.String(required=True, enum=Condition._member_names_,
                                description='The condition of inventory (NEW, OPEN_BOX, USED)'),
     'quantity': fields.Integer(required=True,
