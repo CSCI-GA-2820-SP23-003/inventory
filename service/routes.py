@@ -6,7 +6,8 @@ Service is used to manage products in the inventory.
 
 # pylint: disable=cyclic-import, import-error
 from flask import jsonify, request, url_for, make_response, abort
-from flask_restx import fields, reqparse  # TODO: add Api, Resource, inputs.
+# pylint: disable=unused-import
+from flask_restx import Api, Resource, fields, reqparse, inputs  # noqa: F401
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, DataValidationError, Condition
 
@@ -35,6 +36,7 @@ def index():
 
 
 # Define the model so that the docs reflect what can be sent
+# pylint: disable=protected-access
 create_model = api.model('Inventory', {
     'name': fields.String(required=True,
                           description='The name of the inventory item'),
