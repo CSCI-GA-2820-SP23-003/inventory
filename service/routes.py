@@ -4,7 +4,7 @@ Inventory Service
 Service is used to manage products in the inventory.
 """
 
-# pylint: disable=cyclic-import, import-error
+# pylint: disable=cyclic-import, import-error, line-too-long
 from flask import jsonify, request, url_for, make_response, abort
 # pylint: disable=unused-import
 from flask_restx import Api, Resource, fields, reqparse, inputs  # noqa: F401
@@ -59,37 +59,19 @@ inventory_model = api.inherit(
 
 # query string arguments
 inventory_args = reqparse.RequestParser()
+inventory_args.add_argument('name', type=str, location='args', required=False, help='List Inventory Items by Name')
+inventory_args.add_argument('condition', type=str, location='args', required=False, help='List Inventory Items by Condition')
+inventory_args.add_argument('restock', type=int, location='args', required=False, help='List Inventory Items by Restock Level')
+inventory_args.add_argument('quantity', type=int, location='args', required=False, help='List Inventory Items by Quantity')
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
-
-
-######################################################################
-# ADD A NEW INVENTORY ITEM
-######################################################################
-@app.route("/inventory", methods=["POST"])
-def create_inventory_item():  # Replace entry with item
-    """
-    Creates an inventory item
-
-    This endpoint will create an item based on the data in the body that is posted
-    """
-    app.logger.info("Request to create an inventory item")
-    check_content_type("application/json")
-    item = Inventory()
-    item.deserialize(request.get_json())
-    item.create()
-    message = item.serialize()
-    location_url = url_for("get_inventory", inventory_id=item.id, _external=True)
-
-    app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-
-
 ######################################################################
 # RETRIEVE AN INVENTORY ITEM
 ######################################################################
+
+
 @app.route("/inventory/<int:inventory_id>", methods=["GET"])
 def get_inventory(inventory_id):
     """
@@ -155,37 +137,6 @@ def delete_inventory(inventory_id):
 
 
 ######################################################################
-# LIST ALL INVENTORY ITEMS
-######################################################################
-@app.route("/inventory", methods=["GET"])
-def list_inventory_items():
-    """
-    List all inventory items
-
-    This endpoint will list all inventory items in the database
-    """
-    app.logger.info("Request to list all inventory items")
-    items = []
-    condition = request.args.get("condition")
-    restock = request.args.get("restock")
-    quantity = request.args.get("quantity")
-    name = request.args.get("name")
-    if condition:
-        items = Inventory.find_by_condition(condition)
-    elif restock:
-        items = Inventory.find_by_restock_level(restock)
-    elif quantity:
-        items = Inventory.find_by_quantity(quantity)
-    elif name:
-        items = Inventory.find_by_name(name)
-    else:
-        items = Inventory.all()
-    results = [item.serialize() for item in items]
-    app.logger.info("Returning %d inventory items", len(results))
-    return jsonify(results), status.HTTP_200_OK
-
-
-######################################################################
 # RESTOCK AN INVENTORY ITEM
 ######################################################################
 
@@ -212,6 +163,66 @@ def restock_inventory(inventory_id):
         item.update()
 
     return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+#  PATH: /inventory
+######################################################################
+@api.route('/inventory', strict_slashes=False)
+class InventoryCollection(Resource):
+    """ Handles all interactions with collections of Inventory """
+    ######################################################################
+    # ADD A NEW INVENTORY ITEM
+    ######################################################################
+    @api.doc('create_inventory')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(create_model)
+    @api.marshal_with(inventory_model, code=201)
+    def post(self):
+        """
+        Creates an inventory item
+        This endpoint will create an item based on the data in the body that is posted
+        """
+        app.logger.info("Request to create an inventory item")
+        check_content_type("application/json")
+        item = Inventory()
+        item.deserialize(request.get_json())
+        item.create()
+        location_url = url_for("get_inventory", inventory_id=item.id, _external=True)
+        app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
+        return item.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
+
+    ######################################################################
+    # LIST ALL INVENTORY ITEMS
+    ######################################################################
+    @api.doc('list_inventory_items')
+    @api.expect(inventory_args, validate=True)
+    @api.marshal_list_with(inventory_model)
+    def get(self):
+        """
+        List all inventory items
+
+        This endpoint will list all inventory items in the database
+        """
+        app.logger.info("Request to list all inventory items")
+        items = []
+        condition = request.args.get("condition")
+        restock = request.args.get("restock")
+        quantity = request.args.get("quantity")
+        name = request.args.get("name")
+        if condition:
+            items = Inventory.find_by_condition(condition)
+        elif restock:
+            items = Inventory.find_by_restock_level(restock)
+        elif quantity:
+            items = Inventory.find_by_quantity(quantity)
+        elif name:
+            items = Inventory.find_by_name(name)
+        else:
+            items = Inventory.all()
+        results = [item.serialize() for item in items]
+        app.logger.info("Returning %d inventory items", len(results))
+        return results, status.HTTP_200_OK
 
 
 ######################################################################

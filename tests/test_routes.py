@@ -19,6 +19,7 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/inventory"
+BASE_COLLECTION_URL = "/api/inventory"
 
 
 ######################################################################
@@ -57,7 +58,7 @@ class TestInventoryServer(TestCase):
         items = []
         for _ in range(count):
             test_item = InventoryFactory()
-            response = self.client.post(BASE_URL, json=test_item.serialize())
+            response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
             self.assertEqual(
                 response.status_code, status.HTTP_201_CREATED, "Could not create test item"
             )
@@ -80,7 +81,7 @@ class TestInventoryServer(TestCase):
         """It should Create a new item"""
         test_item = InventoryFactory()
         logging.debug("Test Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Make sure location header is set
@@ -141,7 +142,7 @@ class TestInventoryServer(TestCase):
         # Create an inventory item
         test_item = InventoryFactory()
         logging.debug("Test Inventory Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Update an inventory item
@@ -156,7 +157,7 @@ class TestInventoryServer(TestCase):
     def test_list_all_inventory_items(self):
         """It should Get a list of all inventory item"""
         self._create_items(5)
-        response = self.client.get(BASE_URL)
+        response = self.client.get(BASE_COLLECTION_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
@@ -168,7 +169,7 @@ class TestInventoryServer(TestCase):
         test_item.quantity = 10
         test_item.restock_level = 20
         logging.debug("Test Inventory Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Before restock: quantity <= restock_level
@@ -189,7 +190,7 @@ class TestInventoryServer(TestCase):
         test_item.quantity = 20
         test_item.restock_level = 20
         logging.debug("Test Inventory Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Before restock: quantity <= restock_level
@@ -209,7 +210,7 @@ class TestInventoryServer(TestCase):
         test_condition = items[0].condition
         condition_items = [item for item in items if item.condition == test_condition]
         response = self.client.get(
-            BASE_URL,
+            BASE_COLLECTION_URL,
             query_string=f"condition={quote_plus(test_condition.name)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -225,7 +226,7 @@ class TestInventoryServer(TestCase):
         restock_items = [item for item in items if item.quantity <= item.restock_level]
         restock_condition = random.choice(["true", "True"])
         response = self.client.get(
-            BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
+            BASE_COLLECTION_URL, query_string=f"restock={quote_plus(restock_condition)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -240,7 +241,7 @@ class TestInventoryServer(TestCase):
         restock_items = [item for item in items if item.quantity > item.restock_level]
         restock_condition = random.choice(["false", "False"])
         response = self.client.get(
-            BASE_URL, query_string=f"restock={quote_plus(restock_condition)}"
+            BASE_COLLECTION_URL, query_string=f"restock={quote_plus(restock_condition)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -255,7 +256,7 @@ class TestInventoryServer(TestCase):
         test_quantity = items[0].quantity
         quantity_items = [item for item in items if item.quantity == test_quantity]
         response = self.client.get(
-            BASE_URL,
+            BASE_COLLECTION_URL,
             query_string=f"quantity={quote_plus(str(test_quantity))}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -271,7 +272,7 @@ class TestInventoryServer(TestCase):
         test_name = items[0].name
         name_items = [item for item in items if item.name == test_name]
         response = self.client.get(
-            BASE_URL,
+            BASE_COLLECTION_URL,
             query_string=f"name={quote_plus(test_name)}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -287,17 +288,17 @@ class TestInventoryServer(TestCase):
 
     def test_create_item_no_data(self):
         """It should not Create an item with missing data"""
-        response = self.client.post(BASE_URL, json={})
+        response = self.client.post(BASE_COLLECTION_URL, json={})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_item_no_content_type(self):
         """It should not Create an item with no content type"""
-        response = self.client.post(BASE_URL)
+        response = self.client.post(BASE_COLLECTION_URL)
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_item_wrong_content_type(self):
         """It should not Create an item with wrong content type"""
-        response = self.client.post(BASE_URL, content_type="text/html")
+        response = self.client.post(BASE_COLLECTION_URL, content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_item_bad_restock_level(self):
@@ -306,7 +307,7 @@ class TestInventoryServer(TestCase):
         logging.debug(test_item)
         # change restock_level to an unknown value
         test_item.restock_level = "true"
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_inventory_bad_quantity(self):
@@ -316,7 +317,7 @@ class TestInventoryServer(TestCase):
         # change quantity to a bad string
         test_item = item.serialize()
         test_item["quantity"] = "male"    # wrong case
-        response = self.client.post(BASE_URL, json=test_item)
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_inventory_bad_condition(self):
@@ -326,7 +327,7 @@ class TestInventoryServer(TestCase):
         # change condition to a bad string
         test_item = item.serialize()
         test_item["condition"] = "damaged"
-        response = self.client.post(BASE_URL, json=test_item)
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_inventory_no_id(self):
@@ -343,7 +344,7 @@ class TestInventoryServer(TestCase):
         # Create an inventory item
         test_item = InventoryFactory()
         logging.debug("Test Inventory Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Update an inventory item
@@ -377,7 +378,7 @@ class TestInventoryServer(TestCase):
         test_item.quantity = 10
         test_item.restock_level = 5
         logging.debug("Test Inventory Item: %s", test_item.serialize())
-        response = self.client.post(BASE_URL, json=test_item.serialize())
+        response = self.client.post(BASE_COLLECTION_URL, json=test_item.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Before restock: quantity > restock_level
@@ -412,7 +413,7 @@ class TestInventoryServer(TestCase):
         """Querying list all with wrong condition should return 400"""
         test_condition = "OLD"
         response = self.client.get(
-            BASE_URL,
+            BASE_COLLECTION_URL,
             query_string=f"condition={quote_plus(test_condition)}"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -425,7 +426,7 @@ class TestInventoryServer(TestCase):
         ]
         for test_quantity in test_quantity_list:
             response = self.client.get(
-                BASE_URL,
+                BASE_COLLECTION_URL,
                 query_string=f"quantity={quote_plus(test_quantity)}"
             )
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -435,7 +436,7 @@ class TestInventoryServer(TestCase):
         test_restock_string_list = ["34", "34.01", "yes", "no"]
         for test_restock_string in test_restock_string_list:
             response = self.client.get(
-                BASE_URL,
+                BASE_COLLECTION_URL,
                 query_string=f"restock={quote_plus(test_restock_string)}"
             )
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
