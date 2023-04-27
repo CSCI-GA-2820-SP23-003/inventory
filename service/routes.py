@@ -6,11 +6,13 @@ Service is used to manage products in the inventory.
 
 # pylint: disable=cyclic-import, import-error
 from flask import jsonify, request, url_for, make_response, abort
+# pylint: disable=unused-import
+from flask_restx import Api, Resource, fields, reqparse, inputs  # noqa: F401
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory, DataValidationError
+from service.models import Inventory, DataValidationError, Condition
 
 # Import Flask application
-from . import app
+from . import app, api
 
 
 ############################################################
@@ -33,9 +35,35 @@ def index():
     return app.send_static_file("index.html")
 
 
+# Define the model so that the docs reflect what can be sent
+# pylint: disable=protected-access
+create_model = api.model('Inventory', {
+    'name': fields.String(required=True,
+                          description='The name of the inventory item'),
+    'condition': fields.String(required=True, enum=Condition._member_names_,
+                               description='The condition of inventory (NEW, OPEN_BOX, USED)'),
+    'quantity': fields.Integer(required=True,
+                               description='The quantity of an inventory item'),
+    'restock_level': fields.Integer(required=True,
+                                    description='The restock level of an inventory item'),
+})
+
+inventory_model = api.inherit(
+    'InventoryModel',
+    create_model,
+    {
+        'id': fields.String(readOnly=True,
+                            description='The unique id assigned internally by service'),
+    }
+)
+
+# query string arguments
+inventory_args = reqparse.RequestParser()
+
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
+
 
 ######################################################################
 # ADD A NEW INVENTORY ITEM
