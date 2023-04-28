@@ -222,7 +222,7 @@ class InventoryCollection(Resource):
 
 
 @api.route('/inventory/<inventory_id>/restock')
-@api.param('pet_id', 'The Pet identifier')
+@api.param('inventory_id', 'The Inventory Item identifier')
 class RestockResource(Resource):
     """ Restock Action on an Inventory Item"""
     ######################################################################
