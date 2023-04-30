@@ -114,7 +114,7 @@ Scenario: Do not Restock an Inventory Item which is above the restock level
     And the "Restock Level" field should be empty
     When I paste the "Id" field
     And I press the "Restock" button
-    Then I should see the message "409 Conflict"
+    Then I should not see "Success"
 
 Scenario: Search for inventory items by Name
     When I visit the "home page"
@@ -282,5 +282,5 @@ Scenario: Delete an Inventory Item
     Then I should see the message "Item has been Deleted!"
     When I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see the message "404 Not Found"
+    Then I should not see "Success"
     

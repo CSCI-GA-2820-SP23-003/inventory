@@ -4,12 +4,12 @@ Inventory Service
 Service is used to manage products in the inventory.
 """
 
-# pylint: disable=cyclic-import, import-error, line-too-long
+# pylint: disable=cyclic-import, import-error
 from flask import request, abort
 # pylint: disable=unused-import
-from flask_restx import Api, Resource, fields, reqparse, inputs  # noqa: F401
+from flask_restx import Resource, fields, reqparse  # noqa: F401
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory, DataValidationError, Condition
+from service.models import Inventory, Condition
 
 # Import Flask application
 from . import app, api
@@ -59,10 +59,14 @@ inventory_model = api.inherit(
 
 # query string arguments
 inventory_args = reqparse.RequestParser()
-inventory_args.add_argument('name', type=str, location='args', required=False, help='List Inventory Items by Name')
-inventory_args.add_argument('condition', type=str, location='args', required=False, help='List Inventory Items by Condition')
-inventory_args.add_argument('restock', type=int, location='args', required=False, help='List Inventory Items by Restock Level')
-inventory_args.add_argument('quantity', type=int, location='args', required=False, help='List Inventory Items by Quantity')
+inventory_args.add_argument('name', type=str, location='args', required=False,
+                            help='List Inventory Items by Name')
+inventory_args.add_argument('condition', type=str, location='args', required=False,
+                            help='List Inventory Items by Condition')
+inventory_args.add_argument('restock', type=str, location='args', required=False,
+                            help='List Inventory Items by Restock Level')
+inventory_args.add_argument('quantity', type=str, location='args', required=False,
+                            help='List Inventory Items by Quantity')
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
@@ -94,7 +98,7 @@ class InventoryResource(Resource):
         """
         Retrieve a single Inventory
 
-        This endpoint will return a Inventory based on it's id
+        This endpoint will return an Inventory item based on it's id
         """
         app.logger.info("Request for item with id: %s", inventory_id)
         inventory = Inventory.find(inventory_id)
@@ -109,7 +113,7 @@ class InventoryResource(Resource):
     ######################################################################
 
     @api.doc('update_inventory_items')
-    @api.response(404, 'Pet not found')
+    @api.response(404, 'Inventory item not found')
     @api.response(400, 'The posted Item data was not valid')
     @api.expect(inventory_model)
     @api.marshal_with(inventory_model)
@@ -121,17 +125,12 @@ class InventoryResource(Resource):
         """
 
         app.logger.info("Request to update an inventory item with inventory_id:%s", inventory_id)
-        check_content_type("application/json")
         item = Inventory.find(inventory_id)
         if not item:
             abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} not found")
-        try:
-            item.deserialize(request.get_json())
-            item.id = inventory_id
-            item.update()
-        except DataValidationError:
-            abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
-
+        item.deserialize(request.get_json())
+        item.id = inventory_id
+        item.update()
         return item.serialize(), status.HTTP_200_OK
 
     ######################################################################
@@ -176,9 +175,8 @@ class InventoryCollection(Resource):
         This endpoint will create an item based on the data in the body that is posted
         """
         app.logger.info("Request to create an inventory item")
-        check_content_type("application/json")
         item = Inventory()
-        item.deserialize(request.get_json())
+        item.deserialize(api.payload)
         item.create()
         location_url = api.url_for(InventoryResource, inventory_id=item.id, _external=True)
         app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
@@ -198,10 +196,11 @@ class InventoryCollection(Resource):
         """
         app.logger.info("Request to list all inventory items")
         items = []
-        condition = request.args.get("condition")
-        restock = request.args.get("restock")
-        quantity = request.args.get("quantity")
-        name = request.args.get("name")
+        args = inventory_args.parse_args()
+        condition = args["condition"]
+        restock = args["restock"]
+        quantity = args["quantity"]
+        name = args["name"]
         if condition:
             items = Inventory.find_by_condition(condition)
         elif restock:
@@ -230,18 +229,19 @@ class RestockResource(Resource):
     ######################################################################
     @api.doc('restock_item')
     @api.response(404, 'Inventory Item not found')
-    @api.response(409, 'The item is not available for restock')
+    @api.response(409, 'The item quantity is above restock level')
     def put(self, inventory_id):
         """
         Restock an existing inventory item
 
-        This is an Action as URL that will perform an restock to an existing
+        This is an Action as URL that will restock an existing
         inventory item in the database
         """
         app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)
         item = Inventory.find(inventory_id)
         if not item:
-            abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} was not found")
+            abort(status.HTTP_404_NOT_FOUND,
+                  f"Item with inventory_id: {inventory_id} was not found")
         if item.quantity > item.restock_level:
             abort(
                 status.HTTP_409_CONFLICT,
@@ -253,27 +253,3 @@ class RestockResource(Resource):
             item.update()
 
         return item.serialize(), status.HTTP_200_OK
-
-
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
