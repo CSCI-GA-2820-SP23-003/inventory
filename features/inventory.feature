@@ -284,3 +284,7 @@ Scenario: Delete an Inventory Item
     And I press the "Retrieve" button
     Then I should see the message "404 Not Found"
     
+Scenario: The swagger API docs is running
+    When I visit the "home page"
+    And I press the "API" button
+    Then I should see "NYU-DevOps Inventory REST API Service" in the title
