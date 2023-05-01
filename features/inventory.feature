@@ -286,6 +286,12 @@ Scenario: Delete an Inventory Item
     Then I should not see "Success"
     And I should see the message "was not found"
 
+Scenario: No item found of retrieve for items
+    When I visit the "home page"
+    And I set the "Id" to "00000"
+    And I press the "Retrieve" button
+    Then I should see the message "was not found"
+
 Scenario: The swagger API docs is running
     When I visit the "home page"
     And I press the "API" button
