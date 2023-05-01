@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: inventory
-  type: NodePort
+  type: ClusterIP
   internalTrafficPolicy: Local
   ports:
     - name: http
