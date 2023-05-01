@@ -115,6 +115,7 @@ Scenario: Do not Restock an Inventory Item which is above the restock level
     When I paste the "Id" field
     And I press the "Restock" button
     Then I should not see "Success"
+    And I should see the message "already above the restock level"
 
 Scenario: Search for inventory items by Name
     When I visit the "home page"
@@ -283,7 +284,8 @@ Scenario: Delete an Inventory Item
     When I paste the "Id" field
     And I press the "Retrieve" button
     Then I should not see "Success"
-    
+    And I should see the message "was not found"
+
 Scenario: The swagger API docs is running
     When I visit the "home page"
     And I press the "API" button
