@@ -34,20 +34,41 @@ dot-env-example     - copy to .env to use environment variables
 requirements.txt    - list if Python libraries required by your code
 config.py           - configuration parameters
 
+deploy/                - deploy package
+├── deployment.yaml    - deployment in Kubernetes
+├── postgresql.yaml    - database in Kubernetes
+└── service.yaml       - service in Kubernetes
+
+features/                   - test case package for bdd
+├── environment.py          - environment setup for bdd
+├── inventory.feature       - feature files in gherkin
+└── steps                   - steps package
+    ├── inventory_steps.py  - setps file for inventory feature
+    └── web_steps.py        - steps file for web interactions with Selenium
+
+images/       - images package
+└── ui.png    - user interface image
+
 service/                   - service python package
 ├── __init__.py            - package initializer
 ├── models.py              - module with business models
 ├── routes.py              - module with service routes
-└── common                 - common code package
+├── common                 - common code package
     ├── error_handlers.py  - HTTP error handling code
     ├── log_handlers.py    - logging setup code
     └── status.py          - HTTP status constants
+└── static                 - rest api user interface code package
+    ├── index.html         - home page
+    └── js                 - js code package
+        └── rest_api.js    - crud oeprations for user interface
 
 tests/              - test cases package
 ├── __init__.py     - package initializer
+├── factories.py    - test suite for factory methods
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
 ```
+
 ## Database schema
 
 | Field       | Type        | Description | Primary Key |
@@ -75,13 +96,13 @@ Following is the User Interface that is provided to the inventory manager when t
 </p>
 <h4 align="center">
 
-#### `Create an Inventory Item`
+### `Create an Inventory Item`
 - Set the required fields of the inventory item.
 - Press `Create` and you should get a success message with the `Item ID` field populated.
 
-### `Retrive an Inventory Item`
+### `Retrieve an Inventory Item`
 - Enter the `Item ID` of the item.
-- Press `Retrive` and you should get a success message with all the fields populated.
+- Press `Retrieve` and you should get a success message with all the fields populated.
 - If the `Item Id` does not exist, you would get a `404 Not Found` with all the other fields cleared.
 
 ### `Clear the fields`
@@ -109,6 +130,10 @@ Following is the User Interface that is provided to the inventory manager when t
 - If the item is above the `Restock Level`, you would see a `409 Conflict`.
 - If the item does not exist, you would see a `404 Not Found`.
 - If the item quantity is below the `Restock Level`, you would see a `Success` message and the fields would get populated with `Restock Level + 1` as the new quantity.
+
+### `API Docs`
+- Press the `API Docs` button.
+- It will open a new page with the API documentation.
 
 ## Inventory APIs
 
