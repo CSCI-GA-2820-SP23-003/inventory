@@ -15,7 +15,7 @@ from compare import expect
 def step_impl(context):
     """ Delete all items and load new ones """
     # List all of the items and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/inventory"
+    rest_endpoint = f"{context.BASE_URL}/api/inventory"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for inventory in context.resp.json():

@@ -5,11 +5,11 @@ Service is used to manage products in the inventory.
 """
 
 # pylint: disable=cyclic-import, import-error
-from flask import jsonify, request, url_for, make_response, abort
+from flask import request, abort
 # pylint: disable=unused-import
-from flask_restx import Api, Resource, fields, reqparse, inputs  # noqa: F401
+from flask_restx import Resource, fields, reqparse
 from service.common import status  # HTTP Status Codes
-from service.models import Inventory, DataValidationError, Condition
+from service.models import Inventory, Condition
 
 # Import Flask application
 from . import app, api
@@ -59,6 +59,14 @@ inventory_model = api.inherit(
 
 # query string arguments
 inventory_args = reqparse.RequestParser()
+inventory_args.add_argument('name', type=str, location='args', required=False,
+                            help='List Inventory Items by Name')
+inventory_args.add_argument('condition', type=str, location='args', required=False,
+                            help='List Inventory Items by Condition')
+inventory_args.add_argument('restock', type=str, location='args', required=False,
+                            help='List Inventory Items by Restock Level')
+inventory_args.add_argument('quantity', type=str, location='args', required=False,
+                            help='List Inventory Items by Quantity')
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
@@ -66,173 +74,182 @@ inventory_args = reqparse.RequestParser()
 
 
 ######################################################################
-# ADD A NEW INVENTORY ITEM
+#  PATH: /inventory/{inventory_id}
 ######################################################################
-@app.route("/inventory", methods=["POST"])
-def create_inventory_item():  # Replace entry with item
+@api.route('/inventory/<inventory_id>')
+@api.param('inventory_id', 'The Inventory identifier')
+class InventoryResource(Resource):
     """
-    Creates an inventory item
+    InventoryResource class
 
-    This endpoint will create an item based on the data in the body that is posted
-    """
-    app.logger.info("Request to create an inventory item")
-    check_content_type("application/json")
-    item = Inventory()
-    item.deserialize(request.get_json())
-    item.create()
-    message = item.serialize()
-    location_url = url_for("get_inventory", inventory_id=item.id, _external=True)
-
-    app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-
-
-######################################################################
-# RETRIEVE AN INVENTORY ITEM
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["GET"])
-def get_inventory(inventory_id):
-    """
-    Retrieve a single Inventory
-
-    This endpoint will return a Inventory based on it's id
-    """
-    app.logger.info("Request for item with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
-
-    app.logger.info("Returning item: %s", inventory.name)
-    return jsonify(inventory.serialize()), status.HTTP_200_OK
-
-
-######################################################################
-#  UPDATE AN INVENTORY ITEM
-######################################################################
-
-@app.route("/inventory/<int:inventory_id>", methods=["PUT"])
-def update_inventory(inventory_id):
-    """
-    Updating an inventory item
-
-    This endpoint will update an item based on the data in the body that is posted
+    Allows the manipulation of a single Inventory Item
+    GET /inventory/{inventory_id} - Returns an Item with the inventory_id
+    PUT /inventory/{inventory_id} - Update an Item with the inventory_id
+    DELETE /inventory/{inventory_id} -  Deletes an Item with the inventory_id
     """
 
-    app.logger.info("Request to update an inventory item with inventory_id:%s", inventory_id)
-    check_content_type("application/json")
-    item = Inventory.find(inventory_id)
-    if not item:
-        abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} not found")
-    try:
+    ######################################################################
+    # RETRIEVE AN INVENTORY ITEM
+    ######################################################################
+    @api.doc('get_inventory_items')
+    @api.response(404, 'Inventory Item not found')
+    @api.marshal_with(inventory_model)
+    def get(self, inventory_id):
+        """
+        Retrieve a single Inventory
+
+        This endpoint will return an Inventory item based on it's id
+        """
+        app.logger.info("Request for item with id: %s", inventory_id)
+        inventory = Inventory.find(inventory_id)
+        if not inventory:
+            abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+
+        app.logger.info("Returning item: %s", inventory.name)
+        return inventory.serialize(), status.HTTP_200_OK
+
+    ######################################################################
+    #  UPDATE AN INVENTORY ITEM
+    ######################################################################
+
+    @api.doc('update_inventory_items')
+    @api.response(404, 'Inventory item not found')
+    @api.response(400, 'The posted Item data was not valid')
+    @api.expect(inventory_model)
+    @api.marshal_with(inventory_model)
+    def put(self, inventory_id):
+        """
+        Updating an inventory item
+
+        This endpoint will update an item based on the data in the body that is posted
+        """
+
+        app.logger.info("Request to update an inventory item with inventory_id:%s", inventory_id)
+        item = Inventory.find(inventory_id)
+        if not item:
+            abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} not found")
         item.deserialize(request.get_json())
         item.id = inventory_id
         item.update()
-    except DataValidationError:
-        abort(status.HTTP_400_BAD_REQUEST, "Malformed request")
+        return item.serialize(), status.HTTP_200_OK
 
-    return jsonify(item.serialize()), status.HTTP_200_OK
+    ######################################################################
+    # DELETE AN INVENTORY ITEM
+    ######################################################################
 
+    @api.doc('delete_inventory_items')
+    @api.response(204, 'Inventory Item deleted')
+    def delete(self, inventory_id):
+        """
+        Delete an inventory
 
-######################################################################
-# DELETE AN INVENTORY ITEM
-######################################################################
-@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
-def delete_inventory(inventory_id):
-    """
-    Delete an inventory
+        This endpoint will delete an inventory item based the id specified in the path
+        """
+        app.logger.info("Request to delete inventory with id: %s", inventory_id)
+        inventory = Inventory.find(inventory_id)
+        if inventory:
+            inventory.delete()
+            app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
+        else:
+            app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
 
-    This endpoint will delete an inventory item based the id specified in the path
-    """
-    app.logger.info("Request to delete inventory with id: %s", inventory_id)
-    inventory = Inventory.find(inventory_id)
-    if inventory:
-        inventory.delete()
-        app.logger.info("Inventory with ID [%s] delete complete.", inventory_id)
-    else:
-        app.logger.info("Inventory with ID [%s] does not exist", inventory_id)
-
-    return make_response("", status.HTTP_204_NO_CONTENT)
+        return '', status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
-# LIST ALL INVENTORY ITEMS
+#  PATH: /inventory
 ######################################################################
-@app.route("/inventory", methods=["GET"])
-def list_inventory_items():
-    """
-    List all inventory items
+@api.route('/inventory', strict_slashes=False)
+class InventoryCollection(Resource):
+    """ Handles all interactions with collections of Inventory """
+    ######################################################################
+    # ADD A NEW INVENTORY ITEM
+    ######################################################################
+    @api.doc('create_inventory')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(create_model)
+    @api.marshal_with(inventory_model, code=201)
+    def post(self):
+        """
+        Creates an inventory item
+        This endpoint will create an item based on the data in the body that is posted
+        """
+        app.logger.info("Request to create an inventory item")
+        item = Inventory()
+        item.deserialize(api.payload)
+        item.create()
+        location_url = api.url_for(InventoryResource, inventory_id=item.id, _external=True)
+        app.logger.info("Inventory item named [%s] with ID [%s] created.", item.name, item.id)
+        return item.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
-    This endpoint will list all inventory items in the database
-    """
-    app.logger.info("Request to list all inventory items")
-    items = []
-    condition = request.args.get("condition")
-    restock = request.args.get("restock")
-    quantity = request.args.get("quantity")
-    name = request.args.get("name")
-    if condition:
-        items = Inventory.find_by_condition(condition)
-    elif restock:
-        items = Inventory.find_by_restock_level(restock)
-    elif quantity:
-        items = Inventory.find_by_quantity(quantity)
-    elif name:
-        items = Inventory.find_by_name(name)
-    else:
-        items = Inventory.all()
-    results = [item.serialize() for item in items]
-    app.logger.info("Returning %d inventory items", len(results))
-    return jsonify(results), status.HTTP_200_OK
+    ######################################################################
+    # LIST ALL INVENTORY ITEMS
+    ######################################################################
+    @api.doc('list_inventory_items')
+    @api.expect(inventory_args, validate=True)
+    @api.marshal_list_with(inventory_model)
+    def get(self):
+        """
+        List all inventory items
 
+        This endpoint will list all inventory items in the database
+        """
+        app.logger.info("Request to list all inventory items")
+        items = []
+        args = inventory_args.parse_args()
+        condition = args["condition"]
+        restock = args["restock"]
+        quantity = args["quantity"]
+        name = args["name"]
+        if condition:
+            items = Inventory.find_by_condition(condition)
+        elif restock:
+            items = Inventory.find_by_restock_level(restock)
+        elif quantity:
+            items = Inventory.find_by_quantity(quantity)
+        elif name:
+            items = Inventory.find_by_name(name)
+        else:
+            items = Inventory.all()
+        results = [item.serialize() for item in items]
+        app.logger.info("Returning %d inventory items", len(results))
+        return results, status.HTTP_200_OK
 
 ######################################################################
-# RESTOCK AN INVENTORY ITEM
-######################################################################
-
-@app.route("/inventory/<int:inventory_id>/restock", methods=["PUT"])
-def restock_inventory(inventory_id):
-    """
-    Restock an existing inventory item
-
-    This is an Action as URL that will perform an restock to an existing
-    inventory item in the database
-    """
-    app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)
-    item = Inventory.find(inventory_id)
-    if not item:
-        abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} was not found")
-    if item.quantity > item.restock_level:
-        abort(
-            status.HTTP_409_CONFLICT,
-            f"Item with inventory_id: {inventory_id} is already above the restock level"
-        )
-    else:
-        item.quantity = item.restock_level + 1
-        item.id = inventory_id
-        item.update()
-
-    return jsonify(item.serialize()), status.HTTP_200_OK
-
-
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
+#  PATH: /inventory/{inventory_id}/restock
 ######################################################################
 
 
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
+@api.route('/inventory/<inventory_id>/restock')
+@api.param('inventory_id', 'The Inventory Item identifier')
+class RestockResource(Resource):
+    """ Restock Action on an Inventory Item"""
+    ######################################################################
+    # RESTOCK AN INVENTORY ITEM
+    ######################################################################
+    @api.doc('restock_item')
+    @api.response(404, 'Inventory Item not found')
+    @api.response(409, 'The item quantity is above restock level')
+    def put(self, inventory_id):
+        """
+        Restock an existing inventory item
 
-    if request.headers["Content-Type"] == content_type:
-        return
+        This is an Action as URL that will restock an existing
+        inventory item in the database
+        """
+        app.logger.info("Request to restock an inventory item with inventory_id:%s", inventory_id)
+        item = Inventory.find(inventory_id)
+        if not item:
+            abort(status.HTTP_404_NOT_FOUND,
+                  f"Item with inventory_id: {inventory_id} was not found")
+        if item.quantity > item.restock_level:
+            abort(
+                status.HTTP_409_CONFLICT,
+                f"Item with inventory_id: {inventory_id} is already above the restock level"
+            )
+        else:
+            item.quantity = item.restock_level + 1
+            item.id = inventory_id
+            item.update()
 
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
+        return item.serialize(), status.HTTP_200_OK
