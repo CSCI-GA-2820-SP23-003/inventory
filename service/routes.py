@@ -6,7 +6,6 @@ Service is used to manage products in the inventory.
 
 # pylint: disable=cyclic-import, import-error
 from flask import request, abort
-# pylint: disable=unused-import
 from flask_restx import Resource, fields, reqparse
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, Condition
