@@ -230,6 +230,7 @@ class RestockResource(Resource):
     @api.doc('restock_item')
     @api.response(404, 'Inventory Item not found')
     @api.response(409, 'The item quantity is above restock level')
+    @api.marshal_with(inventory_model)
     def put(self, inventory_id):
         """
         Restock an existing inventory item
