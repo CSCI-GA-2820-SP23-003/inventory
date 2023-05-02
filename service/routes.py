@@ -63,7 +63,8 @@ inventory_args.add_argument('name', type=str, location='args', required=False,
 inventory_args.add_argument('condition', type=str, location='args', required=False,
                             help='List Inventory Items by Condition')
 inventory_args.add_argument('restock', type=str, location='args', required=False,
-                            help='List Inventory Items by Restock Level')
+                            help='List Inventory Items by Necessity to Restock'
+                            '\nAccepted values are true/True/false/False')
 inventory_args.add_argument('quantity', type=str, location='args', required=False,
                             help='List Inventory Items by Quantity')
 
