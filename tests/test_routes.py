@@ -320,12 +320,22 @@ class TestInventoryServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_inventory_bad_condition(self):
-        """It should not Create an item with bad a bad condition"""
+        """It should not Create an item with a bad condition"""
         item = InventoryFactory()
         logging.debug(item)
         # change condition to a bad string
         test_item = item.serialize()
         test_item["condition"] = "damaged"
+        response = self.client.post(BASE_URL, json=test_item)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_inventory_empty_name(self):
+        """It should not Create an item with an empty name"""
+        item = InventoryFactory()
+        logging.debug(item)
+        # change name to an empty string
+        test_item = item.serialize()
+        test_item["name"] = ""
         response = self.client.post(BASE_URL, json=test_item)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
