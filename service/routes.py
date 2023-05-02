@@ -52,7 +52,7 @@ inventory_model = api.inherit(
     create_model,
     {
         'id': fields.Integer(readOnly=True,
-                            description='The unique id assigned internally by service'),
+                             description='The unique id assigned internally by service'),
     }
 )
 
