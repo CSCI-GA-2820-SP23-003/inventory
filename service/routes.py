@@ -5,7 +5,7 @@ Service is used to manage products in the inventory.
 """
 
 # pylint: disable=cyclic-import, import-error
-from flask import request, abort
+from flask import abort
 from flask_restx import Resource, fields, reqparse
 from service.common import status  # HTTP Status Codes
 from service.models import Inventory, Condition
@@ -51,8 +51,8 @@ inventory_model = api.inherit(
     'InventoryModel',
     create_model,
     {
-        'id': fields.String(readOnly=True,
-                            description='The unique id assigned internally by service'),
+        'id': fields.Integer(readOnly=True,
+                             description='The unique id assigned internally by service'),
     }
 )
 
@@ -63,7 +63,8 @@ inventory_args.add_argument('name', type=str, location='args', required=False,
 inventory_args.add_argument('condition', type=str, location='args', required=False,
                             help='List Inventory Items by Condition')
 inventory_args.add_argument('restock', type=str, location='args', required=False,
-                            help='List Inventory Items by Restock Level')
+                            help='List Inventory Items by Necessity to Restock'
+                            '\nAccepted values are true/True/false/False')
 inventory_args.add_argument('quantity', type=str, location='args', required=False,
                             help='List Inventory Items by Quantity')
 
@@ -75,7 +76,7 @@ inventory_args.add_argument('quantity', type=str, location='args', required=Fals
 ######################################################################
 #  PATH: /inventory/{inventory_id}
 ######################################################################
-@api.route('/inventory/<inventory_id>')
+@api.route('/inventory/<int:inventory_id>')
 @api.param('inventory_id', 'The Inventory identifier')
 class InventoryResource(Resource):
     """
@@ -127,7 +128,7 @@ class InventoryResource(Resource):
         item = Inventory.find(inventory_id)
         if not item:
             abort(status.HTTP_404_NOT_FOUND, f"Item with inventory_id: {inventory_id} not found")
-        item.deserialize(request.get_json())
+        item.deserialize(api.payload)
         item.id = inventory_id
         item.update()
         return item.serialize(), status.HTTP_200_OK
@@ -219,7 +220,7 @@ class InventoryCollection(Resource):
 ######################################################################
 
 
-@api.route('/inventory/<inventory_id>/restock')
+@api.route('/inventory/<int:inventory_id>/restock')
 @api.param('inventory_id', 'The Inventory Item identifier')
 class RestockResource(Resource):
     """ Restock Action on an Inventory Item"""
