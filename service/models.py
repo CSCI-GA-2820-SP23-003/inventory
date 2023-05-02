@@ -172,6 +172,9 @@ class Inventory(db.Model):
     def find(cls, by_id):
         """ Finds an Inventory item by it's ID """
         logger.info("Processing lookup for id %s ...", by_id)
+        if not isinstance(by_id, int):
+            if not by_id.isdigit():
+                raise DataValidationError("ID must be an int")
         return cls.query.get(by_id)
 
     @classmethod
