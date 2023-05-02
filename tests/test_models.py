@@ -245,6 +245,14 @@ class TestInventoryModel(unittest.TestCase):
         item = Inventory()
         self.assertRaises(DataValidationError, item.deserialize, data)
 
+    def test_deserialize_empty_name(self):
+        """It should not deserialize an empty name attribute"""
+        test_item = InventoryFactory()
+        data = test_item.serialize()
+        data["name"] = ""
+        item = Inventory()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
     def test_find_inventory_item(self):
         """It should Find an Inventory item by ID"""
         items = InventoryFactory.create_batch(5)

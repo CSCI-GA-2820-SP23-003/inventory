@@ -117,6 +117,10 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
+            if not self.name:
+                raise DataValidationError(
+                    "[Name] cannot be empty"
+                )
             self.condition = getattr(Condition, data["condition"])
             if isinstance(data["quantity"], int):
                 self.quantity = data["quantity"]
