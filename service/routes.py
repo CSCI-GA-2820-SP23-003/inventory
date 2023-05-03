@@ -76,7 +76,7 @@ inventory_args.add_argument('quantity', type=str, location='args', required=Fals
 ######################################################################
 #  PATH: /inventory/{inventory_id}
 ######################################################################
-@api.route('/inventory/<int:inventory_id>')
+@api.route('/inventory/<inventory_id>')
 @api.param('inventory_id', 'The Inventory identifier')
 class InventoryResource(Resource):
     """
@@ -220,7 +220,7 @@ class InventoryCollection(Resource):
 ######################################################################
 
 
-@api.route('/inventory/<int:inventory_id>/restock')
+@api.route('/inventory/<inventory_id>/restock')
 @api.param('inventory_id', 'The Inventory Item identifier')
 class RestockResource(Resource):
     """ Restock Action on an Inventory Item"""
