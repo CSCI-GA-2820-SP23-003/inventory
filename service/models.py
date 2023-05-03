@@ -174,7 +174,9 @@ class Inventory(db.Model):
         logger.info("Processing lookup for id %s ...", by_id)
         if not isinstance(by_id, int):
             if not by_id.isdigit():
-                raise DataValidationError("ID must be an int")
+                raise DataValidationError("Invalid ID: " + by_id)
+        elif by_id <= 0:
+            raise DataValidationError("ID must be positive: " + str(by_id))
         return cls.query.get(by_id)
 
     @classmethod

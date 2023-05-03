@@ -121,6 +121,12 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(found_item.created_at, item.created_at)
         self.assertEqual(found_item.updated_at, item.updated_at)
 
+    def test_read_an_invalid_id(self):
+        """It should not Read an invalid ID"""
+        invalid_ids = [-1, "abc", "-1"]
+        for invalid_id in invalid_ids:
+            self.assertRaises(DataValidationError, Inventory.find, invalid_id)
+
     def test_update_an_inventory_item(self):
         """It should Update an Inventory item"""
         item = InventoryFactory()
